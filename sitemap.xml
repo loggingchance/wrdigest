@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://woodsrun.forestenterprise.org/</loc>
-  </url>
-  <url>
-    <loc>https://woodsrun.forestenterprise.org/archive/</loc>
-  </url>
-  <url>
-    <loc>https://woodsrun.forestenterprise.org/research/</loc>
-  </url>
+  <url><loc>https://woodsrun.forestenterprise.org/</loc></url>
+  <url><loc>https://woodsrun.forestenterprise.org/archive/</loc></url>
+  <url><loc>https://woodsrun.forestenterprise.org/research/</loc></url>
+  <url><loc>https://woodsrun.forestenterprise.org/2026/09/05/</loc><lastmod>2026-09-05</lastmod></url>
+  <url><loc>https://woodsrun.forestenterprise.org/2026/09/04/</loc><lastmod>2026-09-04</lastmod></url>
+  <url><loc>https://woodsrun.forestenterprise.org/2026/09/03/</loc><lastmod>2026-09-03</lastmod></url>
 </urlset>
