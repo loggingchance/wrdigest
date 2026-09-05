@@ -1,0 +1,64 @@
+name: Check Buffer connection
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/buffer-check.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check-buffer:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify Buffer API key and list connected channels
+        env:
+          BUFFER_API_KEY: ${{ secrets.BUFFER_API_KEY }}
+        run: |
+          set -euo pipefail
+          if [ -z "${BUFFER_API_KEY:-}" ]; then
+            echo "BUFFER_API_KEY secret is missing."
+            exit 1
+          fi
+
+          org_payload='{"query":"query GetOrganizations { account { organizations { id name } } }"}'
+          org_response=$(curl --fail-with-body -sS -X POST 'https://api.buffer.com' \
+            -H 'Content-Type: application/json' \
+            -H "Authorization: Bearer ${BUFFER_API_KEY}" \
+            -d "$org_payload")
+
+          if echo "$org_response" | jq -e '.errors' >/dev/null; then
+            echo "$org_response" | jq .
+            exit 1
+          fi
+
+          org_id=$(echo "$org_response" | jq -r '.data.account.organizations[0].id // empty')
+          org_name=$(echo "$org_response" | jq -r '.data.account.organizations[0].name // empty')
+          if [ -z "$org_id" ]; then
+            echo "No Buffer organization found."
+            exit 1
+          fi
+          echo "Buffer organization: ${org_name} (${org_id})"
+
+          channels_payload=$(jq -n --arg org "$org_id" '{query:("query GetChannels { channels(input: { organizationId: \"" + $org + "\" }) { id name service } }")}')
+          channels_response=$(curl --fail-with-body -sS -X POST 'https://api.buffer.com' \
+            -H 'Content-Type: application/json' \
+            -H "Authorization: Bearer ${BUFFER_API_KEY}" \
+            -d "$channels_payload")
+
+          if echo "$channels_response" | jq -e '.errors' >/dev/null; then
+            echo "$channels_response" | jq .
+            exit 1
+          fi
+
+          echo "Connected Buffer channels:"
+          echo "$channels_response" | jq -r '.data.channels[] | "- \(.service): \(.name) [\(.id)]"'
+
+          x_count=$(echo "$channels_response" | jq '[.data.channels[] | select(.service == "twitter")] | length')
+          if [ "$x_count" -lt 1 ]; then
+            echo "No X/Twitter channel is connected in Buffer."
+            exit 1
+          fi
