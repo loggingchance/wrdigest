@@ -1,0 +1,54 @@
+/* Woods Run illustrated masthead */
+.site-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0 28px;
+  align-items: end;
+  padding: 0;
+  overflow: hidden;
+}
+
+.site-header::before {
+  content: "";
+  display: block;
+  grid-column: 1 / -1;
+  height: 158px;
+  background-color: #efe7d8;
+  background-image: url('/assets/woodsrun-header.webp');
+  background-repeat: no-repeat;
+  background-position: center 52%;
+  background-size: cover;
+  border-bottom: 1px solid var(--line);
+}
+
+.brand-block {
+  padding: 23px 0 20px 38px;
+}
+
+.site-nav {
+  align-self: end;
+  padding: 0 38px 20px 0;
+}
+
+@media (max-width: 760px) {
+  .site-header {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0;
+    padding: 0;
+  }
+
+  .site-header::before {
+    height: 104px;
+    background-position: center 52%;
+  }
+
+  .brand-block {
+    padding: 17px 18px 0;
+  }
+
+  .site-nav {
+    margin-top: 13px;
+    padding: 0 18px 15px;
+  }
+}
