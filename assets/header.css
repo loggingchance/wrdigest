@@ -16,7 +16,10 @@
   background-color: #efe7d8;
   background-image: url('/assets/woodsrun-header.webp');
   background-repeat: no-repeat;
-  background-position: center 52%;
+  /* The source artwork is deliberately much taller than the masthead.
+     Bias the crop downward so the logs, log section, peavey and lumber wagon
+     remain visible instead of showing the quieter parchment area above them. */
+  background-position: center 84%;
   background-size: cover;
   border-bottom: 1px solid var(--line);
 }
@@ -40,7 +43,7 @@
 
   .site-header::before {
     height: 104px;
-    background-position: center 52%;
+    background-position: center 72%;
   }
 
   .brand-block {
