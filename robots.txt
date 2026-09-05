@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://woodsrun.forestenterprise.org/sitemap.xml
