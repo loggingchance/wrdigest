@@ -2,16 +2,19 @@
 """Publish the prepared FBS quote card to X and Instagram through Buffer.
 
 The daily ChatGPT task chooses a source-balanced unused quote from Dropbox and writes
-its public/raw image URL to data/quote_post.json. This script publishes the same card
-to both social channels and records the quote in data/quote_history.json only after
-both channels are confirmed as posted (either newly created or already present).
+its Dropbox image URL to data/quote_post.json. The GitHub workflow first stages that
+image in assets/quote-posts so Buffer receives a stable public raw.githubusercontent.com
+URL, then this script publishes the same card to X and Instagram. The quote is recorded
+in data/quote_history.json only after both destinations are confirmed.
 """
 
 from __future__ import annotations
 
 import json
 import os
+import re
 import sys
+import time
 import urllib.error
 import urllib.request
 from datetime import datetime
@@ -22,6 +25,8 @@ BUFFER_API = "https://api.buffer.com"
 TIMEZONE = ZoneInfo("America/Denver")
 POST_FILE = Path("data/quote_post.json")
 HISTORY_FILE = Path("data/quote_history.json")
+PUBLIC_REPO_ROOT = "https://raw.githubusercontent.com/loggingchance/wrdigest/main"
+ASSET_DIR = "assets/quote-posts"
 
 TARGETS = (
     {"service": "twitter", "name": "ForestBizSchool", "label": "X"},
@@ -101,6 +106,37 @@ def load_json(path: Path, default=None):
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def safe_filename(name: str) -> str:
+    name = Path(name).name
+    stem = re.sub(r"[^A-Za-z0-9._-]+", "-", name).strip("-.")
+    return stem or "quote-card.jpg"
+
+
+def staged_asset_path(prepared: dict) -> str:
+    return f"{ASSET_DIR}/{prepared['date']}_{safe_filename(prepared['filename'])}"
+
+
+def staged_image_url(prepared: dict) -> str:
+    return f"{PUBLIC_REPO_ROOT}/{staged_asset_path(prepared)}"
+
+
+def wait_for_public_image(url: str) -> None:
+    for attempt in range(1, 21):
+        request = urllib.request.Request(url, headers={"User-Agent": "WoodsRunDigest/1.0"})
+        try:
+            with urllib.request.urlopen(request, timeout=20) as response:
+                body = response.read(32)
+                content_type = response.headers.get("Content-Type", "")
+                if response.status == 200 and body and "image" in content_type.lower():
+                    print(f"Public quote image is live: {url}")
+                    return
+        except Exception:
+            pass
+        if attempt < 20:
+            time.sleep(3)
+    fail(f"Staged quote image did not become publicly readable: {url}")
+
+
 def already_recorded(history: dict, date: str, quote_index: int) -> bool:
     for item in history.get("used", []):
         if item.get("date") == date or int(item.get("quoteIndex", -1)) == quote_index:
@@ -108,7 +144,7 @@ def already_recorded(history: dict, date: str, quote_index: int) -> bool:
     return False
 
 
-def recent_media_post(org_id: str, channel_id: str, today: str) -> dict | None:
+def recent_media_post(org_id: str, channel_id: str, today: str, expected_image_url: str) -> dict | None:
     query = """
     query RecentQuotePosts($organizationId: OrganizationId!, $channelId: ChannelId!) {
       posts(
@@ -134,7 +170,8 @@ def recent_media_post(org_id: str, channel_id: str, today: str) -> dict | None:
         created = (post.get("createdAt") or "")[:10]
         text = (post.get("text") or "").strip()
         assets = post.get("assets") or []
-        if created == today and not text and assets:
+        sources = {(asset.get("source") or "").strip() for asset in assets}
+        if created == today and not text and expected_image_url in sources:
             return post
     return None
 
@@ -171,7 +208,7 @@ def publish(channel_id: str, image_url: str, service: str) -> dict:
     return post
 
 
-def record_success(history: dict, prepared: dict, posts: dict[str, dict]) -> None:
+def record_success(history: dict, prepared: dict, posts: dict[str, dict], image_url: str) -> None:
     used = history.setdefault("used", [])
     x_post = posts.get("twitter") or {}
     instagram_post = posts.get("instagram") or {}
@@ -180,6 +217,7 @@ def record_success(history: dict, prepared: dict, posts: dict[str, dict]) -> Non
         "quoteIndex": int(prepared["quoteIndex"]),
         "filename": prepared["filename"],
         "source": prepared["source"],
+        "publicImageUrl": image_url,
         "bufferPostId": x_post.get("id"),
         "externalLink": x_post.get("externalLink"),
         "xBufferPostId": x_post.get("id"),
@@ -208,6 +246,9 @@ def main() -> None:
         print("This quote/date is already recorded as posted to both channels; no action needed.")
         return
 
+    image_url = staged_image_url(prepared)
+    wait_for_public_image(image_url)
+
     org_id = organization_id()
     all_channels = channels(org_id)
     selected = {
@@ -217,6 +258,7 @@ def main() -> None:
 
     print(f"Publishing quote {quote_index}: {prepared['filename']}")
     print(f"Source: {prepared['source']}")
+    print(f"Public image: {image_url}")
 
     posts: dict[str, dict] = {}
     for target in TARGETS:
@@ -224,20 +266,20 @@ def main() -> None:
         label = target["label"]
         channel = selected[service]
 
-        existing = recent_media_post(org_id, channel["id"], today)
+        existing = recent_media_post(org_id, channel["id"], today, image_url)
         if existing:
-            print(f"{label}: media-only post already exists today ({existing.get('id')}); treating it as complete.")
+            print(f"{label}: this quote image already exists today ({existing.get('id')}); treating it as complete.")
             posts[service] = existing
             continue
 
-        post = publish(channel["id"], prepared["imageUrl"], service)
+        post = publish(channel["id"], image_url, service)
         posts[service] = post
         print(f"{label}: Buffer accepted post {post.get('id')} with status {post.get('status')}.")
         print(f"{label} external link: {post.get('externalLink') or '(pending)'}")
 
     if len(posts) != len(TARGETS):
         fail("Not all quote-card destinations were confirmed.")
-    record_success(history, prepared, posts)
+    record_success(history, prepared, posts, image_url)
     print("Quote card confirmed on X and Instagram; history updated.")
 
 
