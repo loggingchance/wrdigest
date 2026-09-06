@@ -18,12 +18,12 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Query Buffer Instagram channel and recent posts
+      - name: Query Buffer and independently verify Instagram permalink
         env:
           BUFFER_API_KEY: ${{ secrets.BUFFER_API_KEY }}
         run: |
           python - <<'PY'
-          import json, os, re, urllib.error, urllib.request
+          import json, os, urllib.error, urllib.parse, urllib.request
           key=os.environ['BUFFER_API_KEY']
           def gql(q,v=None):
               req=urllib.request.Request('https://api.buffer.com',data=json.dumps({'query':q,'variables':v or {}}).encode(),headers={'Content-Type':'application/json','Authorization':f'Bearer {key}'},method='POST')
@@ -32,29 +32,27 @@ jobs:
               if x.get('errors'):
                   raise SystemExit(json.dumps(x['errors']))
               return x['data']
-          def probe(url):
-              req=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/151 Safari/537.36'})
+          def oembed(url):
+              endpoint='https://graph.facebook.com/v25.0/instagram_oembed?'+urllib.parse.urlencode({'url':url})
+              req=urllib.request.Request(endpoint,headers={'User-Agent':'WoodsRunDigest/1.0'})
               try:
                   with urllib.request.urlopen(req,timeout=30) as r:
-                      body=r.read(250000).decode('utf-8','replace')
-                      title=re.search(r'<title[^>]*>(.*?)</title>',body,re.I|re.S)
-                      return {'status':r.status,'final':r.geturl(),'title':re.sub(r'\s+',' ',title.group(1)).strip() if title else None,'not_available':('page isn\'t available' in body.lower() or 'page is not available' in body.lower()),'bytes':len(body)}
+                      body=json.loads(r.read().decode())
+                      return {'status':r.status,'author_name':body.get('author_name'),'provider_name':body.get('provider_name'),'thumbnail':bool(body.get('thumbnail_url')),'type':body.get('type')}
               except urllib.error.HTTPError as e:
-                  body=e.read(100000).decode('utf-8','replace')
-                  return {'status':e.code,'final':e.geturl(),'not_available':('page isn\'t available' in body.lower() or 'page is not available' in body.lower()),'bytes':len(body)}
+                  return {'status':e.code,'body':e.read(2000).decode('utf-8','replace')}
               except Exception as e:
                   return {'error':repr(e)}
           org=gql('query { account { organizations { id name } } }')['account']['organizations'][0]
-          q='''query C($organizationId: OrganizationId!){ channels(input:{organizationId:$organizationId}){ id name service descriptor type isDisconnected externalLink scopes hasActiveMemberDevice } }'''
+          q='''query C($organizationId: OrganizationId!){ channels(input:{organizationId:$organizationId}){ id name service descriptor type isDisconnected externalLink scopes } }'''
           channels=gql(q,{'organizationId':org['id']})['channels']
           ig=[c for c in channels if c.get('service')=='instagram']
-          print('ORGANIZATION',json.dumps(org))
           print('INSTAGRAM_CHANNELS',json.dumps(ig,indent=2))
           for c in ig:
               q2='''query P($organizationId: OrganizationId!,$channelId: ChannelId!){ posts(first:10,input:{organizationId:$organizationId,filter:{status:[sent,scheduled,error],channelIds:[$channelId]},sort:[{field:createdAt,direction:desc}]}){ edges{ node{ id status schedulingType notificationStatus sentAt createdAt updatedAt externalLink error{message rawError supportUrl} text assets{source mimeType} } } } }'''
               posts=[e['node'] for e in gql(q2,{'organizationId':org['id'],'channelId':c['id']})['posts']['edges']]
-              print('RECENT_POSTS',c['name'],json.dumps(posts,indent=2))
-              for p in posts[:2]:
+              print('RECENT_POSTS',json.dumps(posts[:3],indent=2))
+              for p in posts[:3]:
                   if p.get('externalLink'):
-                      print('HTTP_PROBE',p['id'],p['externalLink'],json.dumps(probe(p['externalLink'])))
+                      print('OEMBED',p['id'],p['externalLink'],json.dumps(oembed(p['externalLink'])))
           PY
