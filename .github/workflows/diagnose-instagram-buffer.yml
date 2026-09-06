@@ -38,9 +38,9 @@ jobs:
               try:
                   with urllib.request.urlopen(req,timeout=30) as r:
                       body=json.loads(r.read().decode())
-                      return {'status':r.status,'author_name':body.get('author_name'),'provider_name':body.get('provider_name'),'thumbnail':bool(body.get('thumbnail_url')),'type':body.get('type')}
+                      return {'status':r.status,'provider_name':body.get('provider_name'),'type':body.get('type'),'html_len':len(body.get('html') or '')}
               except urllib.error.HTTPError as e:
-                  return {'status':e.code,'body':e.read(2000).decode('utf-8','replace')}
+                  return {'status':e.code,'body':e.read(1000).decode('utf-8','replace')}
               except Exception as e:
                   return {'error':repr(e)}
           org=gql('query { account { organizations { id name } } }')['account']['organizations'][0]
@@ -49,10 +49,11 @@ jobs:
           ig=[c for c in channels if c.get('service')=='instagram']
           print('INSTAGRAM_CHANNELS',json.dumps(ig,indent=2))
           for c in ig:
-              q2='''query P($organizationId: OrganizationId!,$channelId: ChannelId!){ posts(first:10,input:{organizationId:$organizationId,filter:{status:[sent,scheduled,error],channelIds:[$channelId]},sort:[{field:createdAt,direction:desc}]}){ edges{ node{ id status schedulingType notificationStatus sentAt createdAt updatedAt externalLink error{message rawError supportUrl} text assets{source mimeType} } } } }'''
+              q2='''query P($organizationId: OrganizationId!,$channelId: ChannelId!){ posts(first:3,input:{organizationId:$organizationId,filter:{status:[sent,scheduled,error],channelIds:[$channelId]},sort:[{field:createdAt,direction:desc}]}){ edges{ node{ id status schedulingType notificationStatus sentAt externalLink error{message rawError supportUrl} text assets{source mimeType} } } } }'''
               posts=[e['node'] for e in gql(q2,{'organizationId':org['id'],'channelId':c['id']})['posts']['edges']]
-              print('RECENT_POSTS',json.dumps(posts[:3],indent=2))
-              for p in posts[:3]:
+              print('RECENT_POSTS',json.dumps(posts,indent=2))
+              for p in posts:
                   if p.get('externalLink'):
                       print('OEMBED',p['id'],p['externalLink'],json.dumps(oembed(p['externalLink'])))
+          print('OEMBED_FAKE',json.dumps(oembed('https://www.instagram.com/p/THIS_IS_NOT_A_REAL_POST_987654321/')))
           PY
