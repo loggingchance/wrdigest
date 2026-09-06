@@ -1,0 +1,44 @@
+name: Publish Woods Run striking item to X
+
+on:
+  schedule:
+    # Run at both possible UTC equivalents of 10:30 America/Denver.
+    # The Python script checks local time and only one pass actually publishes.
+    - cron: '30 16,17 * * *'
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/post_striking_to_buffer.py'
+      - '.github/workflows/publish-striking-x.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: woods-run-striking-x-publish
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out latest site state
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Validate striking-item publisher
+        run: python -m py_compile scripts/post_to_buffer.py scripts/post_striking_to_buffer.py
+
+      - name: Publish today's standout observation through Buffer
+        if: github.event_name != 'push'
+        env:
+          BUFFER_API_KEY: ${{ secrets.BUFFER_API_KEY }}
+          FORCE_RUN: ${{ github.event_name == 'workflow_dispatch' && 'true' || 'false' }}
+        run: python scripts/post_striking_to_buffer.py
