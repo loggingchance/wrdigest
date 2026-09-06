@@ -1,3 +1,4 @@
 2026-09-06T21:35:00Z diagnose Instagram Buffer channel after quote-card X-only result
 second check after initial Buffer sent status
 probe current and known-good Instagram permalinks
+oEmbed verification pass
