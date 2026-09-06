@@ -1,4 +1,18 @@
 {
-  "version": 1,
-  "used": []
+  "version": 2,
+  "used": [
+    {
+      "date": "2026-09-06",
+      "quoteIndex": 1460,
+      "filename": "1460_a-manual-for-northern-woodsmen_markers-should-not-only-show-the-wa.jpg",
+      "source": "Austin Cary, A Manual for Northern Woodsmen",
+      "publicImageUrl": "https://raw.githubusercontent.com/loggingchance/wrdigest/main/assets/quote-posts/2026-09-06_1460_a-manual-for-northern-woodsmen_markers-should-not-only-show-the-wa.jpg",
+      "bufferPostId": "6a9ddabf5c2ba4d1541da43a",
+      "externalLink": "https://twitter.com/ForestBizSchool/status/2096711907654636028",
+      "xBufferPostId": "6a9ddabf5c2ba4d1541da43a",
+      "xExternalLink": "https://twitter.com/ForestBizSchool/status/2096711907654636028",
+      "instagramBufferPostId": "6a9ddac2af83b6dedf9bee9e",
+      "instagramExternalLink": "https://www.instagram.com/p/Dc9gDxYn8WH/"
+    }
+  ]
 }
