@@ -1,0 +1,45 @@
+name: Diagnose Instagram Buffer connection
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'data/instagram-diagnostic.txt'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Query Buffer Instagram channel and recent posts
+        env:
+          BUFFER_API_KEY: ${{ secrets.BUFFER_API_KEY }}
+        run: |
+          python - <<'PY'
+          import json, os, urllib.request
+          key=os.environ['BUFFER_API_KEY']
+          def gql(q,v=None):
+              req=urllib.request.Request('https://api.buffer.com',data=json.dumps({'query':q,'variables':v or {}}).encode(),headers={'Content-Type':'application/json','Authorization':f'Bearer {key}'},method='POST')
+              with urllib.request.urlopen(req,timeout=45) as r:
+                  x=json.loads(r.read().decode())
+              if x.get('errors'):
+                  raise SystemExit(json.dumps(x['errors']))
+              return x['data']
+          org=gql('query { account { organizations { id name } } }')['account']['organizations'][0]
+          q='''query C($organizationId: OrganizationId!){ channels(input:{organizationId:$organizationId}){ id name service descriptor type isDisconnected externalLink scopes hasActiveMemberDevice } }'''
+          channels=gql(q,{'organizationId':org['id']})['channels']
+          ig=[c for c in channels if c.get('service')=='instagram']
+          print('ORGANIZATION',json.dumps(org))
+          print('INSTAGRAM_CHANNELS',json.dumps(ig,indent=2))
+          for c in ig:
+              q2='''query P($organizationId: OrganizationId!,$channelId: ChannelId!){ posts(first:10,input:{organizationId:$organizationId,filter:{status:[sent,scheduled,error],channelIds:[$channelId]},sort:[{field:createdAt,direction:desc}]}){ edges{ node{ id status schedulingType notificationStatus sentAt createdAt updatedAt externalLink error{message rawError supportUrl} text assets{source mimeType} } } } }'''
+              posts=gql(q2,{'organizationId':org['id'],'channelId':c['id']})['posts']['edges']
+              print('RECENT_POSTS',c['name'],json.dumps([e['node'] for e in posts],indent=2))
+          PY
