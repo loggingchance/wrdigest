@@ -28,6 +28,21 @@ jobs:
         with:
           python-version: '3.12'
 
+      - name: Stage today's quote card as a stable public image
+        run: python scripts/stage_quote_image.py
+
+      - name: Publish staged image in repository
+        run: |
+          if git diff --quiet -- assets/quote-posts; then
+            echo "Quote image is already staged."
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add assets/quote-posts
+            git commit -m "Stage FBS quote card for social publishing"
+            git push
+          fi
+
       - name: Publish prepared quote image to X and Instagram through Buffer
         env:
           BUFFER_API_KEY: ${{ secrets.BUFFER_API_KEY }}
