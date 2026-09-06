@@ -23,7 +23,7 @@ jobs:
           BUFFER_API_KEY: ${{ secrets.BUFFER_API_KEY }}
         run: |
           python - <<'PY'
-          import json, os, urllib.request
+          import json, os, re, urllib.error, urllib.request
           key=os.environ['BUFFER_API_KEY']
           def gql(q,v=None):
               req=urllib.request.Request('https://api.buffer.com',data=json.dumps({'query':q,'variables':v or {}}).encode(),headers={'Content-Type':'application/json','Authorization':f'Bearer {key}'},method='POST')
@@ -32,6 +32,18 @@ jobs:
               if x.get('errors'):
                   raise SystemExit(json.dumps(x['errors']))
               return x['data']
+          def probe(url):
+              req=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/151 Safari/537.36'})
+              try:
+                  with urllib.request.urlopen(req,timeout=30) as r:
+                      body=r.read(250000).decode('utf-8','replace')
+                      title=re.search(r'<title[^>]*>(.*?)</title>',body,re.I|re.S)
+                      return {'status':r.status,'final':r.geturl(),'title':re.sub(r'\s+',' ',title.group(1)).strip() if title else None,'not_available':('page isn\'t available' in body.lower() or 'page is not available' in body.lower()),'bytes':len(body)}
+              except urllib.error.HTTPError as e:
+                  body=e.read(100000).decode('utf-8','replace')
+                  return {'status':e.code,'final':e.geturl(),'not_available':('page isn\'t available' in body.lower() or 'page is not available' in body.lower()),'bytes':len(body)}
+              except Exception as e:
+                  return {'error':repr(e)}
           org=gql('query { account { organizations { id name } } }')['account']['organizations'][0]
           q='''query C($organizationId: OrganizationId!){ channels(input:{organizationId:$organizationId}){ id name service descriptor type isDisconnected externalLink scopes hasActiveMemberDevice } }'''
           channels=gql(q,{'organizationId':org['id']})['channels']
@@ -40,6 +52,9 @@ jobs:
           print('INSTAGRAM_CHANNELS',json.dumps(ig,indent=2))
           for c in ig:
               q2='''query P($organizationId: OrganizationId!,$channelId: ChannelId!){ posts(first:10,input:{organizationId:$organizationId,filter:{status:[sent,scheduled,error],channelIds:[$channelId]},sort:[{field:createdAt,direction:desc}]}){ edges{ node{ id status schedulingType notificationStatus sentAt createdAt updatedAt externalLink error{message rawError supportUrl} text assets{source mimeType} } } } }'''
-              posts=gql(q2,{'organizationId':org['id'],'channelId':c['id']})['posts']['edges']
-              print('RECENT_POSTS',c['name'],json.dumps([e['node'] for e in posts],indent=2))
+              posts=[e['node'] for e in gql(q2,{'organizationId':org['id'],'channelId':c['id']})['posts']['edges']]
+              print('RECENT_POSTS',c['name'],json.dumps(posts,indent=2))
+              for p in posts[:2]:
+                  if p.get('externalLink'):
+                      print('HTTP_PROBE',p['id'],p['externalLink'],json.dumps(probe(p['externalLink'])))
           PY
