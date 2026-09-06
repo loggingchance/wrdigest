@@ -2,15 +2,14 @@ name: Publish Woods Run striking item to X
 
 on:
   schedule:
-    # Run at both possible UTC equivalents of 10:30 America/Denver.
-    # The Python script checks local time and only one pass actually publishes.
-    - cron: '30 16,17 * * *'
+    # GitHub scheduled jobs can start a few minutes late. Run repeatedly across
+    # both possible UTC windows; the Python guard and duplicate check make this safe.
+    - cron: '0,15,30,45 16,17 * * *'
   workflow_dispatch:
   push:
     branches: [main]
     paths:
-      - 'scripts/post_striking_to_buffer.py'
-      - '.github/workflows/publish-striking-x.yml'
+      - 'data/striking_trigger.json'
 
 permissions:
   contents: read
@@ -37,8 +36,7 @@ jobs:
         run: python -m py_compile scripts/post_to_buffer.py scripts/post_striking_to_buffer.py
 
       - name: Publish today's standout observation through Buffer
-        if: github.event_name != 'push'
         env:
           BUFFER_API_KEY: ${{ secrets.BUFFER_API_KEY }}
-          FORCE_RUN: ${{ github.event_name == 'workflow_dispatch' && 'true' || 'false' }}
+          FORCE_RUN: ${{ (github.event_name == 'workflow_dispatch' || github.event_name == 'push') && 'true' || 'false' }}
         run: python scripts/post_striking_to_buffer.py
