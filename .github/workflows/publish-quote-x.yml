@@ -33,7 +33,7 @@ jobs:
 
       - name: Publish staged image in repository
         run: |
-          if git diff --quiet -- assets/quote-posts; then
+          if [ -z "$(git status --porcelain -- assets/quote-posts)" ]; then
             echo "Quote image is already staged."
           else
             git config user.name "github-actions[bot]"
