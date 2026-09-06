@@ -10,9 +10,9 @@ Safety/quality behavior:
 - only posts when that issue is dated today in America/Denver;
 - skips cleanly when `strikingText` is blank;
 - prevents duplicate posting by comparing recent Buffer posts;
-- when invoked by the twice-daily UTC cron, only posts at 10:30 America/Denver,
-  so daylight-saving changes do not shift the local posting time;
-- manual runs may set FORCE_RUN=true to bypass the local-time guard.
+- scheduled runs may start late, so a 10:25-11:20 America/Denver window is used
+  rather than requiring the job to start at exactly 10:30;
+- manual/trigger runs may set FORCE_RUN=true to bypass the local-time guard.
 """
 
 from __future__ import annotations
@@ -27,8 +27,8 @@ from zoneinfo import ZoneInfo
 from post_to_buffer import fail, get_organization_id, get_x_channel, graphql
 
 LOCAL_TZ = ZoneInfo("America/Denver")
-TARGET_HOUR = 10
-TARGET_MINUTE = 30
+WINDOW_START_MINUTES = 10 * 60 + 25
+WINDOW_END_MINUTES = 11 * 60 + 20
 MAX_X_TEXT = 280
 
 
@@ -47,7 +47,8 @@ def load_latest_issue() -> dict:
 
 
 def local_time_is_target(now: datetime) -> bool:
-    return now.hour == TARGET_HOUR and now.minute == TARGET_MINUTE
+    minutes = now.hour * 60 + now.minute
+    return WINDOW_START_MINUTES <= minutes <= WINDOW_END_MINUTES
 
 
 def recent_posts_contain_text(organization_id: str, channel_id: str, text: str) -> bool:
@@ -115,7 +116,10 @@ def main() -> None:
     force = os.environ.get("FORCE_RUN", "").strip().lower() in {"1", "true", "yes"}
 
     if not force and not local_time_is_target(now):
-        print(f"Local time is {now:%Y-%m-%d %H:%M %Z}; target is 10:30 America/Denver. Skipping this UTC cron pass.")
+        print(
+            f"Local time is {now:%Y-%m-%d %H:%M %Z}; scheduled publishing window is "
+            "10:25-11:20 America/Denver. Skipping this cron pass."
+        )
         return
 
     issue = load_latest_issue()
