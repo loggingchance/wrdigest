@@ -6,6 +6,7 @@ The script is intentionally conservative:
 - it waits for the dated issue page and social card to be live on GitHub Pages;
 - it verifies the issue page points to the correct dated social card;
 - it checks Buffer for an existing post containing the same dated URL before publishing;
+- it attaches the dated social-card image directly so X does not depend on link-unfurl timing;
 - it publishes immediately with Buffer's automatic publishing mode.
 """
 
@@ -65,9 +66,7 @@ def graphql(query: str, variables: dict | None = None) -> dict:
 
 
 def get_organization_id() -> str:
-    data = graphql(
-        "query GetOrganizations { account { organizations { id name } } }"
-    )
+    data = graphql("query GetOrganizations { account { organizations { id name } } }")
     organizations = data.get("account", {}).get("organizations", [])
     if not organizations:
         fail("No Buffer organization found")
@@ -216,8 +215,6 @@ def shorten_at_word(text: str, max_chars: int) -> str:
 def compose_post(issue: dict, page_url: str) -> str:
     teaser = (issue.get("socialText") or issue.get("summary") or "").strip()
     teaser = teaser.rstrip()
-    # Leave generous room for the URL and line break. X ultimately t.co-wraps links,
-    # but keeping the literal payload under 280 avoids scheduler-side surprises.
     allowance = MAX_X_TEXT - len(page_url) - 2
     teaser = shorten_at_word(teaser, allowance)
     text = f"{teaser}\n\n{page_url}"
@@ -226,12 +223,12 @@ def compose_post(issue: dict, page_url: str) -> str:
     return text
 
 
-def publish(channel_id: str, text: str) -> dict:
+def publish(channel_id: str, text: str, card_url: str) -> dict:
     mutation = """
     mutation PublishWoodsRun($input: CreatePostInput!) {
       createPost(input: $input) {
         ... on PostActionSuccess {
-          post { id text status dueAt externalLink }
+          post { id text status dueAt externalLink assets { source mimeType } }
         }
         ... on MutationError { message }
       }
@@ -246,6 +243,7 @@ def publish(channel_id: str, text: str) -> dict:
                 "schedulingType": "automatic",
                 "mode": "shareNow",
                 "source": "woods-run-digest",
+                "assets": [{"image": {"url": card_url}}],
             }
         },
     )
@@ -255,6 +253,9 @@ def publish(channel_id: str, text: str) -> dict:
     post = payload.get("post")
     if not post:
         fail(f"Unexpected Buffer createPost response: {json.dumps(payload)}")
+    assets = post.get("assets") or []
+    if not assets:
+        fail("Buffer accepted the X post but did not attach the social-card image")
     return post
 
 
@@ -273,11 +274,12 @@ def main() -> None:
         return
 
     text = compose_post(issue, page_url)
-    print("Publishing Woods Run to X through Buffer:")
+    print("Publishing Woods Run to X through Buffer with the dated social-card image attached:")
     print(text)
-    post = publish(channel["id"], text)
+    post = publish(channel["id"], text, card_url)
     print(
-        f"Buffer accepted post {post.get('id')} with status {post.get('status')}. "
+        f"Buffer accepted post {post.get('id')} with status {post.get('status')} and "
+        f"{len(post.get('assets') or [])} attached asset(s). "
         f"External link: {post.get('externalLink') or '(pending)'}"
     )
 
