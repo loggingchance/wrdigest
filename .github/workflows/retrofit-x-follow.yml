@@ -1,0 +1,64 @@
+name: Add X follow button to editions
+
+on:
+  push:
+    paths:
+      - '.github/workflows/retrofit-x-follow.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  retrofit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Add follow button and styles
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          button = '''<p class="edition-follow"><a class="x-follow-button" href="https://x.com/ForestBizSchool" target="_blank" rel="noopener noreferrer" aria-label="Follow Forest Business School on X">Follow @ForestBizSchool on X</a></p>'''
+
+          for path in sorted(Path('2026').glob('**/index.html')):
+              text = path.read_text(encoding='utf-8')
+              if 'x-follow-button' in text:
+                  continue
+              marker = '<p class="edition-subtitle"><em>Prepared from public sources. Links lead to original material.</em></p>'
+              if marker in text:
+                  text = text.replace(marker, marker + '\n' + button, 1)
+                  path.write_text(text, encoding='utf-8')
+                  print(f'Updated {path}')
+
+          css_path = Path('assets/styles.css')
+          css = css_path.read_text(encoding='utf-8')
+          if '.x-follow-button' not in css:
+              css += '''\n\n/* X follow button on daily editions */\n.edition-follow { margin: 17px 0 0; }\n.x-follow-button {\n  display: inline-block;\n  padding: 8px 13px;\n  border: 1px solid var(--forest);\n  border-radius: 4px;\n  color: var(--paper);\n  background: var(--forest);\n  font-size: 13px;\n  font-weight: 700;\n  line-height: 1.2;\n  text-decoration: none;\n}\n.x-follow-button:hover {\n  background: #193524;\n  text-decoration: none;\n}\n@media (max-width: 760px) {\n  .edition-follow { margin-top: 14px; }\n  .x-follow-button { padding: 8px 12px; font-size: 12.5px; }\n}\n'''
+              css_path.write_text(css, encoding='utf-8')
+              print('Updated assets/styles.css')
+          PY
+
+      - name: Commit retrofit
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add 2026 assets/styles.css
+          if git diff --cached --quiet; then
+            echo "No retrofit changes needed."
+            exit 0
+          fi
+          git commit -m "Add X follow button to Woods Run editions"
+          for attempt in 1 2 3 4 5; do
+            git fetch origin main
+            if git rebase origin/main && git push origin HEAD:main; then
+              exit 0
+            fi
+            git rebase --abort 2>/dev/null || true
+            sleep $((attempt * 2))
+          done
+          exit 1
