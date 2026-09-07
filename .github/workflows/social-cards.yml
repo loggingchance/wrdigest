@@ -13,6 +13,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: woods-run-social-cards
+  cancel-in-progress: false
+
 jobs:
   generate:
     if: github.actor != 'github-actions[bot]'
@@ -45,8 +49,24 @@ jobs:
           git add assets/cards/
           if git diff --cached --quiet; then
             echo "No social-card changes to commit."
-          else
-            git commit -m "Generate Woods Run social cards"
-            git pull --rebase origin main
-            git push origin main
+            exit 0
           fi
+
+          git commit -m "Generate Woods Run social cards"
+
+          # Other Woods Run automation can update main while the card job is
+          # running. Retry a rebase/push rather than losing the card to a
+          # non-fast-forward race.
+          for attempt in 1 2 3 4 5; do
+            git fetch origin main
+            if git rebase origin/main && git push origin HEAD:main; then
+              echo "Social-card commit published on attempt ${attempt}."
+              exit 0
+            fi
+            git rebase --abort 2>/dev/null || true
+            echo "Concurrent update detected; retrying social-card push (${attempt}/5)."
+            sleep $((attempt * 2))
+          done
+
+          echo "Unable to publish social-card commit after five attempts."
+          exit 1
