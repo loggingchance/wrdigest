@@ -190,3 +190,27 @@ h2 {
   .edition-nav { display: block; }
   .edition-nav a { display: block; margin-bottom: 8px; }
 }
+
+
+/* X follow button on daily editions */
+.edition-follow { margin: 17px 0 0; }
+.x-follow-button {
+  display: inline-block;
+  padding: 8px 13px;
+  border: 1px solid var(--forest);
+  border-radius: 4px;
+  color: var(--paper);
+  background: var(--forest);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.2;
+  text-decoration: none;
+}
+.x-follow-button:hover {
+  background: #193524;
+  text-decoration: none;
+}
+@media (max-width: 760px) {
+  .edition-follow { margin-top: 14px; }
+  .x-follow-button { padding: 8px 12px; font-size: 12.5px; }
+}
