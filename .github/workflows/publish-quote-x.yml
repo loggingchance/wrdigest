@@ -28,10 +28,13 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Stage today's quote card as a stable public image
+      - name: Install quote-card renderer dependency
+        run: python -m pip install --disable-pip-version-check pillow
+
+      - name: Render today's quote card as a stable public image
         run: python scripts/stage_quote_image.py
 
-      - name: Publish staged image in repository
+      - name: Publish rendered image in repository
         run: |
           if [ -z "$(git status --porcelain -- assets/quote-posts)" ]; then
             echo "Quote image is already staged."
