@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 """Publish the prepared FBS quote card to X and Instagram through Buffer.
 
-The daily ChatGPT task chooses a source-balanced unused quote from Dropbox and writes
-its Dropbox image URL to data/quote_post.json. The GitHub workflow first stages that
-image in assets/quote-posts so Buffer receives a stable public raw.githubusercontent.com
-URL, then this script publishes the same card to X and Instagram. The quote is recorded
-in data/quote_history.json only after both destinations are confirmed.
+The daily ChatGPT task writes only safe quote metadata/text to data/quote_post.json.
+GitHub Actions renders the card locally into assets/quote-posts, then this script gives
+Buffer the stable raw.githubusercontent.com image URL. The quote is recorded in
+quote_history.json only after both destinations are confirmed.
 """
 
 from __future__ import annotations
@@ -109,7 +108,11 @@ def load_json(path: Path, default=None):
 def safe_filename(name: str) -> str:
     name = Path(name).name
     stem = re.sub(r"[^A-Za-z0-9._-]+", "-", name).strip("-.")
-    return stem or "quote-card.jpg"
+    if not stem:
+        return "quote-card.jpg"
+    if not Path(stem).suffix:
+        stem += ".jpg"
+    return stem
 
 
 def staged_asset_path(prepared: dict) -> str:
@@ -121,7 +124,7 @@ def staged_image_url(prepared: dict) -> str:
 
 
 def wait_for_public_image(url: str) -> None:
-    for attempt in range(1, 21):
+    for attempt in range(1, 31):
         request = urllib.request.Request(url, headers={"User-Agent": "WoodsRunDigest/1.0"})
         try:
             with urllib.request.urlopen(request, timeout=20) as response:
@@ -132,7 +135,7 @@ def wait_for_public_image(url: str) -> None:
                     return
         except Exception:
             pass
-        if attempt < 20:
+        if attempt < 30:
             time.sleep(3)
     fail(f"Staged quote image did not become publicly readable: {url}")
 
@@ -231,7 +234,7 @@ def record_success(history: dict, prepared: dict, posts: dict[str, dict], image_
 
 def main() -> None:
     prepared = load_json(POST_FILE)
-    required = ("date", "quoteIndex", "filename", "source", "imageUrl")
+    required = ("date", "quoteIndex", "filename", "source")
     for field in required:
         if prepared.get(field) in (None, ""):
             fail(f"{POST_FILE} is missing {field}")
