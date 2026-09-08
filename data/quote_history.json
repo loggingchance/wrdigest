@@ -27,6 +27,19 @@
       "instagramBufferPostId": null,
       "instagramExternalLink": null,
       "recoveryNote": "Both posts were confirmed live by the user; the workflow failed after publishing and before committing history."
+    },
+    {
+      "date": "2026-09-08",
+      "quoteIndex": 245,
+      "filename": "0245_the-rules-of-the-game_the-rules-don-t-bind-a-man-they-fre.jpg",
+      "source": "The Rules of the Game",
+      "publicImageUrl": "https://raw.githubusercontent.com/loggingchance/wrdigest/main/assets/quote-posts/2026-09-08_0245_the-rules-of-the-game_the-rules-don-t-bind-a-man-they-fre.jpg",
+      "bufferPostId": "6aa07c3c0577be3d3e8a321f",
+      "externalLink": "https://twitter.com/ForestBizSchool/status/2097435064527147114",
+      "xBufferPostId": "6aa07c3c0577be3d3e8a321f",
+      "xExternalLink": "https://twitter.com/ForestBizSchool/status/2097435064527147114",
+      "instagramBufferPostId": "6aa07c3fc4e8349f29378332",
+      "instagramExternalLink": null
     }
   ]
 }
