@@ -1,5 +1,6 @@
 name: Generate Woods Run social cards
 
+# This workflow is also the upstream trigger for Woods Run publishing to X and Instagram.
 on:
   push:
     branches: [main]
