@@ -1,4 +1,4 @@
-name: Publish Woods Run to X
+name: Publish Woods Run to X and Instagram
 
 on:
   workflow_run:
@@ -10,7 +10,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: woods-run-x-publish
+  group: woods-run-social-publish
   cancel-in-progress: false
 
 jobs:
@@ -28,7 +28,7 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Publish newest Woods Run issue to X through Buffer
+      - name: Publish newest Woods Run issue to X and Instagram through Buffer
         env:
           BUFFER_API_KEY: ${{ secrets.BUFFER_API_KEY }}
         run: python scripts/post_to_buffer.py
