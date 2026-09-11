@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
-"""Publish the prepared FBS quote card to X and Instagram through Buffer.
+"""Publish the prepared original FBS quote card to X through Buffer.
 
-The daily ChatGPT task writes only safe quote metadata/text to data/quote_post.json.
-GitHub Actions renders the card locally into assets/quote-posts, then this script gives
-Buffer the stable raw.githubusercontent.com image URL. The quote is recorded in
-quote_history.json only after both destinations are confirmed.
+Instagram is reserved for the daily Woods Run Digest card. Quote cards continue
+on X only. The original Dropbox JPG is staged unchanged before this script runs.
 """
 
 from __future__ import annotations
@@ -29,7 +27,6 @@ ASSET_DIR = "assets/quote-posts"
 
 TARGETS = (
     {"service": "twitter", "name": "ForestBizSchool", "label": "X"},
-    {"service": "instagram", "name": "northeastforests", "label": "Instagram"},
 )
 
 
@@ -179,7 +176,7 @@ def recent_media_post(org_id: str, channel_id: str, today: str, expected_image_u
     return None
 
 
-def publish(channel_id: str, image_url: str, service: str) -> dict:
+def publish(channel_id: str, image_url: str) -> dict:
     mutation = """
     mutation PublishQuote($input: CreatePostInput!) {
       createPost(input: $input) {
@@ -198,35 +195,29 @@ def publish(channel_id: str, image_url: str, service: str) -> dict:
         "source": "woods-run-quote",
         "assets": [{"image": {"url": image_url}}],
     }
-    if service == "instagram":
-        post_input["metadata"] = {"instagram": {"type": "post", "shouldShareToFeed": True}}
 
     data = graphql(mutation, {"input": post_input})
     payload = data.get("createPost") or {}
     if payload.get("message"):
-        fail(f"Buffer rejected {service} quote image: {payload['message']}")
+        fail(f"Buffer rejected X quote image: {payload['message']}")
     post = payload.get("post")
     if not post:
-        fail(f"Unexpected Buffer response for {service}: {json.dumps(payload)}")
+        fail(f"Unexpected Buffer response for X: {json.dumps(payload)}")
     return post
 
 
-def record_success(history: dict, prepared: dict, posts: dict[str, dict], image_url: str) -> None:
+def record_success(history: dict, prepared: dict, post: dict, image_url: str) -> None:
     used = history.setdefault("used", [])
-    x_post = posts.get("twitter") or {}
-    instagram_post = posts.get("instagram") or {}
     used.append({
         "date": prepared["date"],
         "quoteIndex": int(prepared["quoteIndex"]),
         "filename": prepared["filename"],
         "source": prepared["source"],
         "publicImageUrl": image_url,
-        "bufferPostId": x_post.get("id"),
-        "externalLink": x_post.get("externalLink"),
-        "xBufferPostId": x_post.get("id"),
-        "xExternalLink": x_post.get("externalLink"),
-        "instagramBufferPostId": instagram_post.get("id"),
-        "instagramExternalLink": instagram_post.get("externalLink"),
+        "bufferPostId": post.get("id"),
+        "externalLink": post.get("externalLink"),
+        "xBufferPostId": post.get("id"),
+        "xExternalLink": post.get("externalLink"),
     })
     history["version"] = 2
     HISTORY_FILE.write_text(json.dumps(history, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
@@ -246,7 +237,7 @@ def main() -> None:
     quote_index = int(prepared["quoteIndex"])
     history = load_json(HISTORY_FILE, {"version": 2, "used": []})
     if already_recorded(history, today, quote_index):
-        print("This quote/date is already recorded as posted to both channels; no action needed.")
+        print("This quote/date is already recorded as posted to X; no action needed.")
         return
 
     image_url = staged_image_url(prepared)
@@ -254,36 +245,23 @@ def main() -> None:
 
     org_id = organization_id()
     all_channels = channels(org_id)
-    selected = {
-        target["service"]: select_channel(all_channels, target["service"], target["name"], target["label"])
-        for target in TARGETS
-    }
+    channel = select_channel(all_channels, "twitter", "ForestBizSchool", "X")
 
     print(f"Publishing quote {quote_index}: {prepared['filename']}")
     print(f"Source: {prepared['source']}")
     print(f"Public image: {image_url}")
 
-    posts: dict[str, dict] = {}
-    for target in TARGETS:
-        service = target["service"]
-        label = target["label"]
-        channel = selected[service]
+    existing = recent_media_post(org_id, channel["id"], today, image_url)
+    if existing:
+        print(f"X: this quote image already exists today ({existing.get('id')}); treating it as complete.")
+        post = existing
+    else:
+        post = publish(channel["id"], image_url)
+        print(f"X: Buffer accepted post {post.get('id')} with status {post.get('status')}.")
+        print(f"X external link: {post.get('externalLink') or '(pending)'}")
 
-        existing = recent_media_post(org_id, channel["id"], today, image_url)
-        if existing:
-            print(f"{label}: this quote image already exists today ({existing.get('id')}); treating it as complete.")
-            posts[service] = existing
-            continue
-
-        post = publish(channel["id"], image_url, service)
-        posts[service] = post
-        print(f"{label}: Buffer accepted post {post.get('id')} with status {post.get('status')}.")
-        print(f"{label} external link: {post.get('externalLink') or '(pending)'}")
-
-    if len(posts) != len(TARGETS):
-        fail("Not all quote-card destinations were confirmed.")
-    record_success(history, prepared, posts, image_url)
-    print("Quote card confirmed on X and Instagram; history updated.")
+    record_success(history, prepared, post, image_url)
+    print("Quote card confirmed on X; history updated.")
 
 
 if __name__ == "__main__":
