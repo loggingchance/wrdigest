@@ -1,13 +1,9 @@
 #!/usr/bin/env python3
-"""Publish the newest Woods Run issue to X through Buffer.
+"""Publish the newest Woods Run issue to X and Instagram through Buffer.
 
-The script is intentionally conservative:
-- it discovers the connected X channel rather than hard-coding an account ID;
-- it waits for the dated issue page and social card to be live on GitHub Pages;
-- it verifies the issue page points to the correct dated social card;
-- it checks Buffer for an existing post containing the same dated URL before publishing;
-- it attaches the dated social-card image directly so X does not depend on link-unfurl timing;
-- it publishes immediately with Buffer's automatic publishing mode.
+The same dated Woods Run social card is used on both platforms. X receives the
+normal teaser plus dated issue URL. Instagram receives a short caption directing
+readers to the Woods Run link in the profile bio.
 """
 
 from __future__ import annotations
@@ -23,11 +19,14 @@ from pathlib import Path
 
 BUFFER_API = "https://api.buffer.com"
 SITE_ROOT = "https://woodsrun.forestenterprise.org"
-TARGET_SERVICE = "twitter"
-TARGET_NAME = "ForestBizSchool"
 MAX_X_TEXT = 280
 WAIT_ATTEMPTS = 30
 WAIT_SECONDS = 10
+
+TARGETS = (
+    {"service": "twitter", "name": "ForestBizSchool", "label": "X"},
+    {"service": "instagram", "name": "northeastforests", "label": "Instagram"},
+)
 
 
 def fail(message: str) -> None:
@@ -75,7 +74,7 @@ def get_organization_id() -> str:
     return organization["id"]
 
 
-def get_x_channel(organization_id: str) -> dict:
+def get_channels(organization_id: str) -> list[dict]:
     query = """
     query GetChannels($organizationId: OrganizationId!) {
       channels(input: { organizationId: $organizationId }) {
@@ -86,23 +85,23 @@ def get_x_channel(organization_id: str) -> dict:
     }
     """
     data = graphql(query, {"organizationId": organization_id})
-    channels = data.get("channels", [])
-    twitter_channels = [c for c in channels if c.get("service") == TARGET_SERVICE]
-    exact = [
-        c for c in twitter_channels
-        if (c.get("name") or "").casefold() == TARGET_NAME.casefold()
-    ]
+    return data.get("channels", [])
+
+
+def select_channel(all_channels: list[dict], service: str, name: str, label: str) -> dict:
+    matching = [c for c in all_channels if c.get("service") == service]
+    exact = [c for c in matching if (c.get("name") or "").casefold() == name.casefold()]
     if len(exact) == 1:
         channel = exact[0]
-    elif len(twitter_channels) == 1:
-        channel = twitter_channels[0]
-    elif not twitter_channels:
-        fail("No X/Twitter channel is connected in Buffer")
+    elif len(matching) == 1:
+        channel = matching[0]
+        print(f"{label}: expected {name!r}, using the only connected {service} channel {channel.get('name')!r}.")
+    elif not matching:
+        fail(f"No {label} channel is connected in Buffer")
     else:
-        names = ", ".join(c.get("name", "(unnamed)") for c in twitter_channels)
-        fail(f"Multiple X channels found and none uniquely matched {TARGET_NAME}: {names}")
-
-    print(f"Target X channel: {channel.get('name')} [{channel.get('id')}]")
+        names = ", ".join(c.get("name", "(unnamed)") for c in matching)
+        fail(f"Multiple {label} channels found and none uniquely matched {name}: {names}")
+    print(f"Target {label} channel: {channel.get('name')} [{channel.get('id')}]")
     return channel
 
 
@@ -163,7 +162,7 @@ def wait_until_live(page_url: str, card_url: str) -> None:
         card_is_image = card_status == 200 and bool(card_body) and "image" in card_type.lower()
 
         if page_status == 200 and has_card_meta and has_large_card and card_is_image:
-            print("Dated page and social card are live with the expected X metadata.")
+            print("Dated page and social card are live with the expected metadata.")
             return
 
         print(
@@ -177,7 +176,13 @@ def wait_until_live(page_url: str, card_url: str) -> None:
     fail("Timed out waiting for the dated issue page/social card to be deployed")
 
 
-def recent_posts_contain_url(organization_id: str, channel_id: str, page_url: str) -> bool:
+def recent_post_exists(
+    organization_id: str,
+    channel_id: str,
+    service: str,
+    page_url: str,
+    card_url: str,
+) -> bool:
     query = """
     query RecentPosts($organizationId: OrganizationId!, $channelId: ChannelId!) {
       posts(
@@ -188,18 +193,26 @@ def recent_posts_contain_url(organization_id: str, channel_id: str, page_url: st
           sort: [{ field: createdAt, direction: desc }]
         }
       ) {
-        edges { node { id text status createdAt channelId } }
+        edges {
+          node {
+            id text status createdAt channelId externalLink
+            assets { source mimeType }
+          }
+        }
       }
     }
     """
-    data = graphql(
-        query,
-        {"organizationId": organization_id, "channelId": channel_id},
-    )
+    data = graphql(query, {"organizationId": organization_id, "channelId": channel_id})
     for edge in data.get("posts", {}).get("edges", []):
         post = edge.get("node", {})
-        if page_url in (post.get("text") or ""):
-            print(f"Already present in Buffer ({post.get('status')}): {post.get('id')}")
+        text = post.get("text") or ""
+        assets = post.get("assets") or []
+        sources = {(asset.get("source") or "").strip() for asset in assets}
+        if service == "twitter" and page_url in text:
+            print(f"X already contains this issue ({post.get('status')}): {post.get('id')}")
+            return True
+        if service == "instagram" and card_url in sources:
+            print(f"Instagram already contains this issue card ({post.get('status')}): {post.get('id')}")
             return True
     return False
 
@@ -212,9 +225,8 @@ def shorten_at_word(text: str, max_chars: int) -> str:
     return candidate + "…"
 
 
-def compose_post(issue: dict, page_url: str) -> str:
+def compose_x_post(issue: dict, page_url: str) -> str:
     teaser = (issue.get("socialText") or issue.get("summary") or "").strip()
-    teaser = teaser.rstrip()
     allowance = MAX_X_TEXT - len(page_url) - 2
     teaser = shorten_at_word(teaser, allowance)
     text = f"{teaser}\n\n{page_url}"
@@ -223,7 +235,16 @@ def compose_post(issue: dict, page_url: str) -> str:
     return text
 
 
-def publish(channel_id: str, text: str, card_url: str) -> dict:
+def compose_instagram_post(issue: dict) -> str:
+    return (
+        f"Woods Run Digest — {issue['displayDate']}\n\n"
+        "Daily North American forestry & forest-products intelligence from The Forest Business School.\n\n"
+        "Read today’s edition: link in bio.\n"
+        "woodsrun.forestenterprise.org"
+    )
+
+
+def publish(channel_id: str, text: str, card_url: str, service: str) -> dict:
     mutation = """
     mutation PublishWoodsRun($input: CreatePostInput!) {
       createPost(input: $input) {
@@ -234,28 +255,27 @@ def publish(channel_id: str, text: str, card_url: str) -> dict:
       }
     }
     """
-    data = graphql(
-        mutation,
-        {
-            "input": {
-                "text": text,
-                "channelId": channel_id,
-                "schedulingType": "automatic",
-                "mode": "shareNow",
-                "source": "woods-run-digest",
-                "assets": [{"image": {"url": card_url}}],
-            }
-        },
-    )
+    post_input = {
+        "text": text,
+        "channelId": channel_id,
+        "schedulingType": "automatic",
+        "mode": "shareNow",
+        "source": "woods-run-digest",
+        "assets": [{"image": {"url": card_url}}],
+    }
+    if service == "instagram":
+        post_input["metadata"] = {"instagram": {"type": "post", "shouldShareToFeed": True}}
+
+    data = graphql(mutation, {"input": post_input})
     payload = data.get("createPost") or {}
     if payload.get("message"):
-        fail(f"Buffer rejected the post: {payload['message']}")
+        fail(f"Buffer rejected the {service} post: {payload['message']}")
     post = payload.get("post")
     if not post:
-        fail(f"Unexpected Buffer createPost response: {json.dumps(payload)}")
+        fail(f"Unexpected Buffer createPost response for {service}: {json.dumps(payload)}")
     assets = post.get("assets") or []
     if not assets:
-        fail("Buffer accepted the X post but did not attach the social-card image")
+        fail(f"Buffer accepted the {service} post but did not attach the social-card image")
     return post
 
 
@@ -265,23 +285,38 @@ def main() -> None:
     print(f"Latest Woods Run issue: {issue['displayDate']}")
 
     organization_id = get_organization_id()
-    channel = get_x_channel(organization_id)
+    all_channels = get_channels(organization_id)
+    selected = {
+        target["service"]: select_channel(
+            all_channels, target["service"], target["name"], target["label"]
+        )
+        for target in TARGETS
+    }
 
     wait_until_live(page_url, card_url)
 
-    if recent_posts_contain_url(organization_id, channel["id"], page_url):
-        print("No action needed; this dated issue has already been sent to X through Buffer.")
-        return
+    texts = {
+        "twitter": compose_x_post(issue, page_url),
+        "instagram": compose_instagram_post(issue),
+    }
 
-    text = compose_post(issue, page_url)
-    print("Publishing Woods Run to X through Buffer with the dated social-card image attached:")
-    print(text)
-    post = publish(channel["id"], text, card_url)
-    print(
-        f"Buffer accepted post {post.get('id')} with status {post.get('status')} and "
-        f"{len(post.get('assets') or [])} attached asset(s). "
-        f"External link: {post.get('externalLink') or '(pending)'}"
-    )
+    for target in TARGETS:
+        service = target["service"]
+        label = target["label"]
+        channel = selected[service]
+
+        if recent_post_exists(organization_id, channel["id"], service, page_url, card_url):
+            print(f"No {label} action needed; this dated issue is already present.")
+            continue
+
+        print(f"Publishing Woods Run to {label} through Buffer with the dated social card attached:")
+        print(texts[service])
+        post = publish(channel["id"], texts[service], card_url, service)
+        print(
+            f"{label}: Buffer accepted post {post.get('id')} with status {post.get('status')} and "
+            f"{len(post.get('assets') or [])} attached asset(s). "
+            f"External link: {post.get('externalLink') or '(pending)'}"
+        )
 
 
 if __name__ == "__main__":
