@@ -25,7 +25,7 @@ from datetime import datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
-from post_to_buffer import fail, get_organization_id, get_x_channel, graphql
+from post_to_buffer import fail, get_organization_id, get_channels, select_channel, graphql
 
 LOCAL_TZ = ZoneInfo("America/Denver")
 MAX_X_TEXT = 280
@@ -129,7 +129,7 @@ def main() -> None:
         print("Forced trigger run requested; duplicate protection remains active.")
 
     organization_id = get_organization_id()
-    channel = get_x_channel(organization_id)
+    channel = select_channel(get_channels(organization_id), "twitter", "ForestBizSchool", "X")
 
     if recent_posts_contain_text(organization_id, channel["id"], text):
         print("No action needed; today's striking-item post already exists.")
