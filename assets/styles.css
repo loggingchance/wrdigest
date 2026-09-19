@@ -140,3 +140,14 @@ h2 { margin-bottom: 0; font-family: Georgia, 'Times New Roman', serif; font-size
   .wet-woods-box h2 { font-size: 24px; }
   .book-button { margin-bottom: 10px; }
 }
+
+.subscribe-grid { display:grid; grid-template-columns:minmax(0,1.35fr) minmax(280px,.65fr); gap:24px; align-items:start; }
+.subscribe-points { padding-left:20px; margin:18px 0 24px; }
+.subscribe-points li { margin-bottom:10px; }
+.subscribe-box { padding:25px 27px; background:var(--warm); border-left:4px solid var(--forest); }
+.subscribe-box h2 { margin-bottom:14px; font-size:28px; }
+.growth-strip { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:30px; align-items:center; margin:0 -38px; padding:32px 38px; border-top:1px solid var(--line); background:rgba(255,255,255,.18); }
+.growth-strip h2 { font-size:27px; }
+.growth-actions { display:flex; flex-direction:column; gap:9px; align-items:flex-start; font-size:14px; }
+.watch-line { margin-top:8px; padding-left:12px; border-left:3px solid var(--forest); color:#4e5b51; font-size:14px !important; }
+@media (max-width:760px){.subscribe-grid{grid-template-columns:1fr}.growth-strip{grid-template-columns:1fr;margin:0 -18px;padding:28px 18px}.growth-actions{margin-top:4px}}
