@@ -1,0 +1,31 @@
+name: Maintain Woods Run SEO
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '20??/??/??/index.html'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  seo:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Add structured metadata where missing
+        run: python scripts/maintain_seo.py
+      - name: Commit SEO metadata
+        run: |
+          if git diff --quiet; then
+            echo "SEO metadata already present."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add '20'*/*/*/index.html
+          git commit -m "Maintain Woods Run SEO metadata"
+          git push
