@@ -1,0 +1,15 @@
+# Woods Run Digest
+
+> Daily forestry and forest-products intelligence from The Forest Business School.
+
+Woods Run Digest publishes a daily briefing for people working in forestry and forest products. Coverage includes timber sales, stumpage and delivered wood, logging and trucking, sawmills, pulp and paper, biomass, forest-products markets, mill investment and capacity, procurement, equipment, forest business, grants and opportunities, and new forestry publications, datasets and tools.
+
+## Primary pages
+- Latest edition: https://woodsrun.forestenterprise.org/
+- Archive: https://woodsrun.forestenterprise.org/archive/
+- Research and publications: https://woodsrun.forestenterprise.org/research/
+- Sitemap: https://woodsrun.forestenterprise.org/sitemap.xml
+- The Forest Business School: https://www.forestenterprise.org/
+
+## Editorial notes
+Issues are prepared from public sources and link to original material. Woods Run Digest favors specific operational and business information over generic news aggregation.
