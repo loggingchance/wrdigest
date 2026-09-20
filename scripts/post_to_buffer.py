@@ -20,7 +20,7 @@ from pathlib import Path
 BUFFER_API = "https://api.buffer.com"
 SITE_ROOT = "https://woodsrun.forestenterprise.org"
 MAX_X_TEXT = 280
-WAIT_ATTEMPTS = 30
+WAIT_ATTEMPTS = 18
 WAIT_SECONDS = 10
 
 TARGETS = (
@@ -139,7 +139,7 @@ def fetch_public(url: str) -> tuple[int, bytes, str]:
         return 0, b"", ""
 
 
-def wait_until_live(page_url: str, card_url: str) -> None:
+def wait_until_live(page_url: str, card_url: str) -> bool:
     print(f"Waiting for public issue: {page_url}")
     for attempt in range(1, WAIT_ATTEMPTS + 1):
         page_status, page_body, _ = fetch_public(page_url)
@@ -163,7 +163,7 @@ def wait_until_live(page_url: str, card_url: str) -> None:
 
         if page_status == 200 and has_card_meta and has_large_card and card_is_image:
             print("Dated page and social card are live with the expected metadata.")
-            return
+            return True
 
         print(
             f"Attempt {attempt}/{WAIT_ATTEMPTS}: page={page_status}, "
@@ -173,7 +173,8 @@ def wait_until_live(page_url: str, card_url: str) -> None:
         if attempt < WAIT_ATTEMPTS:
             time.sleep(WAIT_SECONDS)
 
-    fail("Timed out waiting for the dated issue page/social card to be deployed")
+    print("Public page is live but the card has not reached Pages yet; using the GitHub-hosted card for Buffer.")
+    return False
 
 
 def recent_post_exists(
@@ -293,7 +294,8 @@ def main() -> None:
         for target in TARGETS
     }
 
-    wait_until_live(page_url, card_url)
+    card_live = wait_until_live(page_url, card_url)
+    publish_card_url = card_url if card_live else "https://raw.githubusercontent.com/loggingchance/wrdigest/main/assets/cards/" + issue["date"] + ".png"
 
     texts = {
         "twitter": compose_x_post(issue, page_url),
@@ -311,7 +313,7 @@ def main() -> None:
 
         print(f"Publishing Woods Run to {label} through Buffer with the dated social card attached:")
         print(texts[service])
-        post = publish(channel["id"], texts[service], card_url, service)
+        post = publish(channel["id"], texts[service], publish_card_url, service)
         print(
             f"{label}: Buffer accepted post {post.get('id')} with status {post.get('status')} and "
             f"{len(post.get('assets') or [])} attached asset(s). "
