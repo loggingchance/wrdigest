@@ -1,0 +1,47 @@
+name: Woods Run social publish failsafe
+
+on:
+  schedule:
+    # GitHub cron is UTC. Run at both possible 4:15 AM Mountain UTC offsets;
+    # the local-time guard below allows only the true 4:15 AM Mountain run.
+    - cron: '15 10,11 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: woods-run-social-failsafe
+  cancel-in-progress: false
+
+jobs:
+  check-and-repair:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check Mountain time
+        id: localtime
+        shell: bash
+        run: |
+          HOUR=$(TZ=America/Denver date +%H)
+          MINUTE=$(TZ=America/Denver date +%M)
+          echo "hour=$HOUR" >> "$GITHUB_OUTPUT"
+          echo "minute=$MINUTE" >> "$GITHUB_OUTPUT"
+          echo "Mountain time: $HOUR:$MINUTE"
+
+      - name: Check out latest site state
+        if: github.event_name == 'workflow_dispatch' || steps.localtime.outputs.hour == '04'
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Set up Python
+        if: github.event_name == 'workflow_dispatch' || steps.localtime.outputs.hour == '04'
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Verify and repair Woods Run social publishing
+        if: github.event_name == 'workflow_dispatch' || steps.localtime.outputs.hour == '04'
+        env:
+          BUFFER_API_KEY: ${{ secrets.BUFFER_API_KEY }}
+        run: python scripts/post_to_buffer.py
