@@ -74,7 +74,7 @@ p=tmp/"99.png"; im.save(p); frames.append((p,4.0))
 clips=[]
 for i,(img,dur) in enumerate(frames):
     clip=tmp/f"clip{i:02d}.mp4"; n=int(dur*FPS)
-    vf=f"scale={W}:{H},zoompan=z='min(zoom+0.00015,1.018)':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)-min(on*0.10,18)':d={n}:s={W}x{H}:fps={FPS},fade=t=in:st=0:d=.22,fade=t=out:st={max(dur-.25,0)}:d=.25,format=yuv420p"
+    vf=f"scale={W}:{H},fade=t=in:st=0:d=.22,fade=t=out:st={max(dur-.25,0)}:d=.25,format=yuv420p"
     subprocess.run(["ffmpeg","-y","-loop","1","-i",str(img),"-vf",vf,"-t",str(dur),"-r",str(FPS),"-c:v","libx264","-preset","medium","-crf","20","-pix_fmt","yuv420p",str(clip)],check=True,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL); clips.append(clip)
 concat=tmp/"concat.txt"; concat.write_text("".join(f"file '{c}'\n" for c in clips))
 out=Path("assets/videos")/(date+".mp4"); out.parent.mkdir(parents=True,exist_ok=True)
