@@ -28,6 +28,9 @@ jobs:
         with:
           python-version: '3.12'
 
+      - name: Validate social publisher
+        run: python -m py_compile scripts/post_to_buffer.py
+
       - name: Publish newest Woods Run issue to X and Instagram through Buffer
         env:
           BUFFER_API_KEY: ${{ secrets.BUFFER_API_KEY }}
