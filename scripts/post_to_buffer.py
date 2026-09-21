@@ -303,6 +303,9 @@ def main() -> None:
 
     card_live = wait_until_live(page_url, card_url)
     publish_card_url = card_url if card_live else "https://raw.githubusercontent.com/loggingchance/wrdigest/main/assets/cards/" + issue["date"] + ".png"
+    reel_status, reel_body, reel_type = fetch_public(reel_url)
+    reel_live = reel_status == 200 and bool(reel_body) and ("video" in reel_type.lower() or "octet-stream" in reel_type.lower())
+    publish_reel_url = reel_url if reel_live else "https://raw.githubusercontent.com/loggingchance/wrdigest/main/assets/videos/" + issue["date"] + ".mp4"
 
     texts = {
         "twitter": compose_x_post(issue, page_url),
