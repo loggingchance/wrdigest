@@ -119,10 +119,11 @@ def load_latest_issue() -> dict:
     return issue
 
 
-def issue_urls(issue: dict) -> tuple[str, str]:
+def issue_urls(issue: dict) -> tuple[str, str, str]:
     page_url = SITE_ROOT + issue["url"]
     card_url = f"{SITE_ROOT}/assets/cards/{issue['date']}.png"
-    return page_url, card_url
+    reel_url = f"{SITE_ROOT}/assets/videos/{issue['date']}.mp4"
+    return page_url, card_url, reel_url
 
 
 def fetch_public(url: str) -> tuple[int, bytes, str]:
