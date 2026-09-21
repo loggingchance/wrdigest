@@ -43,7 +43,7 @@ for sec in soup.select("section.issue-section"):
         h=text(art.find("h3"))
         paras=[text(p) for p in art.find_all("p") if "story-source" not in (p.get("class") or []) and "region-label" not in (p.get("class") or []) and "watch-line" not in (p.get("class") or [])]
         body=paras[0] if paras else ""
-        if len(body)>235: body=body[:232].rsplit(" ",1)[0]+"…"
+        if len(body)>360: body=body[:357].rsplit(" ",1)[0]+"…"
         watch=text(art.select_one(".watch-line"))
         if watch.lower().startswith("watch:"): watch=watch[6:].strip()
         if h and body: stories.append({"region":region,"headline":h,"body":body,"watch":watch})
@@ -58,9 +58,9 @@ d.line((90,y+50,990,y+50),fill=LINE,width=2); d.text((90,H-220),"Daily forestry 
 p=tmp/"00.png"; im.save(p); frames.append((p,2.5))
 for i,s in enumerate(stories,1):
     im,d=base(); d.text((90,105),"WOODS RUN DIGEST",font=ft(BOLD,34),fill=INK); d.text((90,170),s["region"],font=ft(BOLD,28),fill=FOREST); d.text((915,170),f"{i}/{len(stories)}",font=ft(BOLD,26),fill=MUTED); d.line((90,230,990,230),fill=LINE,width=2)
-    y=310; y=multiline(d,90,y,s["headline"],ft(SERIF_BOLD,54),INK,880,18); y+=55; d.rectangle([90,y,990,y+8],fill=FOREST); y+=70; y=multiline(d,90,y,s["body"],ft(SERIF,36),INK,880,16)
+    y=310; y=multiline(d,90,y,s["headline"],ft(SERIF_BOLD,54),INK,880,18); y+=55; d.rectangle([90,y,990,y+8],fill=FOREST); y+=70; y=multiline(d,90,y,s["body"],ft(SERIF,44),FOREST,880,12)
     if s["watch"]:
-        top=min(max(y+60,1270),1490); d.rounded_rectangle([90,top,990,top+230],radius=18,fill=WARM,outline=LINE,width=2); d.text((125,top+30),"WATCH",font=ft(BOLD,25),fill=FOREST); multiline(d,125,top+82,s["watch"],ft(REG,30),INK,820,10)
+        top=min(max(y+60,1270),1490); d.rounded_rectangle([90,top,990,top+230],radius=18,fill=WARM,outline=LINE,width=2); d.text((125,top+30),"WATCH",font=ft(BOLD,25),fill=FOREST); multiline(d,125,top+82,s["watch"],ft(REG,34),INK,820,10)
     d.text((90,H-155),"woodsrun.forestenterprise.org",font=ft(BOLD,27),fill=FOREST)
     p=tmp/f"{i:02d}.png"; im.save(p); frames.append((p,4.6))
 im,d=base(); d.text((90,130),"THE FOREST BUSINESS SCHOOL",font=ft(BOLD,42),fill=FOREST); d.text((90,215),"More from the people behind Woods Run",font=ft(SERIF,43),fill=INK)
