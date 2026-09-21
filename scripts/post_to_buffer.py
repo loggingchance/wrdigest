@@ -313,7 +313,8 @@ def main() -> None:
 
         print(f"Publishing Woods Run to {label} through Buffer with the dated social asset attached:")
         print(texts[service])
-        asset_url = publish_reel_url if service == "instagram" else publish_card_url\n        post = publish(channel["id"], texts[service], asset_url, service)
+        asset_url = publish_reel_url if service == "instagram" else publish_card_url
+        post = publish(channel["id"], texts[service], asset_url, service)
         print(
             f"{label}: Buffer accepted post {post.get('id')} with status {post.get('status')} and "
             f"{len(post.get('assets') or [])} attached asset(s). "
