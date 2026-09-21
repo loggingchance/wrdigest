@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+"""Render the daily vertical Woods Run video used for Instagram Reels and YouTube Shorts."""
 from pathlib import Path
 from bs4 import BeautifulSoup
 from PIL import Image, ImageDraw, ImageFont
