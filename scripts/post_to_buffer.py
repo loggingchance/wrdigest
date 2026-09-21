@@ -184,6 +184,7 @@ def recent_post_exists(
     service: str,
     page_url: str,
     card_url: str,
+    reel_url: str,
 ) -> bool:
     query = """
     query RecentPosts($organizationId: OrganizationId!, $channelId: ChannelId!) {
@@ -205,6 +206,7 @@ def recent_post_exists(
     }
     """
     data = graphql(query, {"organizationId": organization_id, "channelId": channel_id})
+    reel_name = reel_url.rsplit("/", 1)[-1]
     for edge in data.get("posts", {}).get("edges", []):
         post = edge.get("node", {})
         text = post.get("text") or ""
@@ -213,11 +215,10 @@ def recent_post_exists(
         if service == "twitter" and page_url in text:
             print(f"X already contains this issue ({post.get('status')}): {post.get('id')}")
             return True
-        if service == "instagram" and card_url in sources:
-            print(f"Instagram already contains this issue card ({post.get('status')}): {post.get('id')}")
+        if service == "instagram" and any(src == reel_url or src.endswith("/" + reel_name) for src in sources):
+            print(f"Instagram already contains this issue reel ({post.get('status')}): {post.get('id')}")
             return True
     return False
-
 
 def shorten_at_word(text: str, max_chars: int) -> str:
     text = " ".join(text.split())
@@ -257,16 +258,23 @@ def publish(channel_id: str, text: str, asset_url: str, service: str) -> dict:
       }
     }
     """
+    if service == "instagram":
+        assets = [{"video": {"url": asset_url, "metadata": {"thumbnailOffset": 1500}}}]
+        metadata = {"instagram": {"type": "reel", "shouldShareToFeed": True}}
+    else:
+        assets = [{"image": {"url": asset_url}}]
+        metadata = None
+
     post_input = {
         "text": text,
         "channelId": channel_id,
         "schedulingType": "automatic",
         "mode": "shareNow",
         "source": "woods-run-digest",
-        "assets": [{"image": {"url": card_url}}],
+        "assets": assets,
     }
-    if service == "instagram":
-        post_input["metadata"] = {"instagram": {"type": "post", "shouldShareToFeed": True}}
+    if metadata:
+        post_input["metadata"] = metadata
 
     data = graphql(mutation, {"input": post_input})
     payload = data.get("createPost") or {}
@@ -275,11 +283,9 @@ def publish(channel_id: str, text: str, asset_url: str, service: str) -> dict:
     post = payload.get("post")
     if not post:
         fail(f"Unexpected Buffer createPost response for {service}: {json.dumps(payload)}")
-    assets = post.get("assets") or []
-    if not assets:
+    if not (post.get("assets") or []):
         fail(f"Buffer accepted the {service} post but did not attach the requested media asset")
     return post
-
 
 def main() -> None:
     issue = load_latest_issue()
