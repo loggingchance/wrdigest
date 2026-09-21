@@ -71,12 +71,16 @@ for label,url in rows:
 d.text((90,H-290),"Links in bio",font=ft(BOLD,48),fill=INK); d.text((90,H-205),"woodsrun.forestenterprise.org",font=ft(BOLD,28),fill=FOREST)
 p=tmp/"99.png"; im.save(p); frames.append((p,4.0))
 
-clips=[]
-for i,(img,dur) in enumerate(frames):
-    clip=tmp/f"clip{i:02d}.mp4"; n=int(dur*FPS)
-    vf=f"scale={W}:{H},fade=t=in:st=0:d=.22,fade=t=out:st={max(dur-.25,0)}:d=.25,format=yuv420p"
-    subprocess.run(["ffmpeg","-y","-loop","1","-i",str(img),"-vf",vf,"-t",str(dur),"-r",str(FPS),"-c:v","libx264","-preset","medium","-crf","20","-pix_fmt","yuv420p",str(clip)],check=True,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL); clips.append(clip)
-concat=tmp/"concat.txt"; concat.write_text("".join(f"file '{c}'\n" for c in clips))
+concat=tmp/"frames.txt"
+with concat.open("w") as fh:
+    for img,dur in frames:
+        fh.write(f"file '{img}'\n")
+        fh.write(f"duration {dur}\n")
+    fh.write(f"file '{frames[-1][0]}'\n")
 out=Path("assets/videos")/(date+".mp4"); out.parent.mkdir(parents=True,exist_ok=True)
-subprocess.run(["ffmpeg","-y","-f","concat","-safe","0","-i",str(concat),"-c","copy","-movflags","+faststart",str(out)],check=True)
+subprocess.run([
+    "ffmpeg","-y","-f","concat","-safe","0","-i",str(concat),
+    "-vf",f"fps={FPS},scale={W}:{H},format=yuv420p",
+    "-c:v","libx264","-preset","medium","-crf","20","-movflags","+faststart",str(out)
+],check=True)
 print(out)
