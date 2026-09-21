@@ -245,7 +245,7 @@ def compose_instagram_post(issue: dict) -> str:
     )
 
 
-def publish(channel_id: str, text: str, card_url: str, service: str) -> dict:
+def publish(channel_id: str, text: str, asset_url: str, service: str) -> dict:
     mutation = """
     mutation PublishWoodsRun($input: CreatePostInput!) {
       createPost(input: $input) {
@@ -276,13 +276,13 @@ def publish(channel_id: str, text: str, card_url: str, service: str) -> dict:
         fail(f"Unexpected Buffer createPost response for {service}: {json.dumps(payload)}")
     assets = post.get("assets") or []
     if not assets:
-        fail(f"Buffer accepted the {service} post but did not attach the social-card image")
+        fail(f"Buffer accepted the {service} post but did not attach the requested media asset")
     return post
 
 
 def main() -> None:
     issue = load_latest_issue()
-    page_url, card_url = issue_urls(issue)
+    page_url, card_url, reel_url = issue_urls(issue)
     print(f"Latest Woods Run issue: {issue['displayDate']}")
 
     organization_id = get_organization_id()
@@ -307,13 +307,13 @@ def main() -> None:
         label = target["label"]
         channel = selected[service]
 
-        if recent_post_exists(organization_id, channel["id"], service, page_url, card_url):
+        if recent_post_exists(organization_id, channel["id"], service, page_url, card_url, reel_url):
             print(f"No {label} action needed; this dated issue is already present.")
             continue
 
-        print(f"Publishing Woods Run to {label} through Buffer with the dated social card attached:")
+        print(f"Publishing Woods Run to {label} through Buffer with the dated social asset attached:")
         print(texts[service])
-        post = publish(channel["id"], texts[service], publish_card_url, service)
+        asset_url = publish_reel_url if service == "instagram" else publish_card_url\n        post = publish(channel["id"], texts[service], asset_url, service)
         print(
             f"{label}: Buffer accepted post {post.get('id')} with status {post.get('status')} and "
             f"{len(post.get('assets') or [])} attached asset(s). "
