@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Publish the newest Woods Run issue to X and Instagram through Buffer.
+"""Publish the newest Woods Run issue to X, Instagram, and YouTube through Buffer.
 
-The same dated Woods Run social card is used on both platforms. X receives the
-normal teaser plus dated issue URL. Instagram receives a short caption directing
-readers to the Woods Run link in the profile bio.
+X receives the dated social card. Instagram and YouTube receive the same vertical
+Woods Run reel. YouTube is optional: if no YouTube channel is connected in Buffer,
+the daily publishing run continues normally for X and Instagram.
 """
 
 from __future__ import annotations
@@ -24,8 +24,9 @@ WAIT_ATTEMPTS = 18
 WAIT_SECONDS = 10
 
 TARGETS = (
-    {"service": "twitter", "name": "ForestBizSchool", "label": "X"},
-    {"service": "instagram", "name": "northeastforests", "label": "Instagram"},
+    {"service": "twitter", "name": "ForestBizSchool", "label": "X", "required": True},
+    {"service": "instagram", "name": "northeastforests", "label": "Instagram", "required": True},
+    {"service": "youtube", "name": "Steve07870", "label": "YouTube", "required": False},
 )
 
 
@@ -215,8 +216,14 @@ def recent_post_exists(
         if service == "twitter" and page_url in text:
             print(f"X already contains this issue ({post.get('status')}): {post.get('id')}")
             return True
-        if service == "instagram" and any(src == reel_url or src.endswith("/" + reel_name) for src in sources):
-            print(f"Instagram already contains this issue reel ({post.get('status')}): {post.get('id')}")
+        if service in ("instagram", "youtube") and any(
+            src == reel_url or src.endswith("/" + reel_name) for src in sources
+        ):
+            label = "Instagram" if service == "instagram" else "YouTube"
+            print(f"{label} already contains this issue reel ({post.get('status')}): {post.get('id')}")
+            return True
+        if service == "youtube" and page_url in text:
+            print(f"YouTube already contains this issue ({post.get('status')}): {post.get('id')}")
             return True
     return False
 
@@ -247,7 +254,33 @@ def compose_instagram_post(issue: dict) -> str:
     )
 
 
-def publish(channel_id: str, text: str, asset_url: str, service: str) -> dict:
+def compose_youtube_title(issue: dict) -> str:
+    title = (
+        issue.get("cardTeaser")
+        or issue.get("socialText")
+        or issue.get("summary")
+        or f"Woods Run Digest — {issue['displayDate']}"
+    )
+    return shorten_at_word(title, 100)
+
+
+def compose_youtube_post(issue: dict, page_url: str) -> str:
+    summary = " ".join((issue.get("summary") or "").split())
+    return (
+        f"Woods Run Digest — {issue['displayDate']}\n\n"
+        f"{summary}\n\n"
+        f"Read the full edition: {page_url}\n\n"
+        "Daily forestry & forest-products intelligence from The Forest Business School."
+    )
+
+
+def publish(
+    channel_id: str,
+    text: str,
+    asset_url: str,
+    service: str,
+    youtube_title: str | None = None,
+) -> dict:
     mutation = """
     mutation PublishWoodsRun($input: CreatePostInput!) {
       createPost(input: $input) {
@@ -261,6 +294,21 @@ def publish(channel_id: str, text: str, asset_url: str, service: str) -> dict:
     if service == "instagram":
         assets = [{"video": {"url": asset_url, "metadata": {"thumbnailOffset": 1500}}}]
         metadata = {"instagram": {"type": "reel", "shouldShareToFeed": True}}
+    elif service == "youtube":
+        if not youtube_title:
+            fail("YouTube title is missing")
+        assets = [{"video": {"url": asset_url}}]
+        metadata = {
+            "youtube": {
+                "title": youtube_title,
+                "categoryId": "27",
+                "privacy": "public",
+                "madeForKids": False,
+                "notifySubscribers": True,
+                "embeddable": True,
+                "license": "youtube",
+            }
+        }
     else:
         assets = [{"image": {"url": asset_url}}]
         metadata = None
@@ -294,12 +342,16 @@ def main() -> None:
 
     organization_id = get_organization_id()
     all_channels = get_channels(organization_id)
-    selected = {
-        target["service"]: select_channel(
-            all_channels, target["service"], target["name"], target["label"]
+    selected = {}
+    for target in TARGETS:
+        service = target["service"]
+        matching = [c for c in all_channels if c.get("service") == service]
+        if not matching and not target.get("required", True):
+            print(f"{target['label']}: not connected in Buffer; skipping this optional channel.")
+            continue
+        selected[service] = select_channel(
+            all_channels, service, target["name"], target["label"]
         )
-        for target in TARGETS
-    }
 
     card_live = wait_until_live(page_url, card_url)
     publish_card_url = card_url if card_live else "https://raw.githubusercontent.com/loggingchance/wrdigest/main/assets/cards/" + issue["date"] + ".png"
@@ -310,11 +362,15 @@ def main() -> None:
     texts = {
         "twitter": compose_x_post(issue, page_url),
         "instagram": compose_instagram_post(issue),
+        "youtube": compose_youtube_post(issue, page_url),
     }
+    youtube_title = compose_youtube_title(issue)
 
     for target in TARGETS:
         service = target["service"]
         label = target["label"]
+        if service not in selected:
+            continue
         channel = selected[service]
 
         if recent_post_exists(organization_id, channel["id"], service, page_url, card_url, reel_url):
@@ -323,8 +379,14 @@ def main() -> None:
 
         print(f"Publishing Woods Run to {label} through Buffer with the dated social asset attached:")
         print(texts[service])
-        asset_url = publish_reel_url if service == "instagram" else publish_card_url
-        post = publish(channel["id"], texts[service], asset_url, service)
+        asset_url = publish_reel_url if service in ("instagram", "youtube") else publish_card_url
+        post = publish(
+            channel["id"],
+            texts[service],
+            asset_url,
+            service,
+            youtube_title=youtube_title if service == "youtube" else None,
+        )
         print(
             f"{label}: Buffer accepted post {post.get('id')} with status {post.get('status')} and "
             f"{len(post.get('assets') or [])} attached asset(s). "
