@@ -2,7 +2,7 @@ name: Publish Woods Run to X and Instagram
 
 on:
   workflow_run:
-    workflows: ["Generate Woods Run social cards"]
+    workflows: ["Generate Woods Run social assets"]
     types: [completed]
   workflow_dispatch:
 
