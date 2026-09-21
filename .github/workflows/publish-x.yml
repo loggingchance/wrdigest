@@ -1,4 +1,4 @@
-name: Publish Woods Run to X and Instagram
+name: Publish Woods Run to X, Instagram and YouTube
 
 on:
   workflow_run:
@@ -31,7 +31,7 @@ jobs:
       - name: Validate social publisher
         run: python -m py_compile scripts/post_to_buffer.py
 
-      - name: Publish newest Woods Run issue to X and Instagram through Buffer
+      - name: Publish newest Woods Run issue through Buffer
         env:
           BUFFER_API_KEY: ${{ secrets.BUFFER_API_KEY }}
         run: python scripts/post_to_buffer.py
