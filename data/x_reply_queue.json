@@ -1,0 +1,6 @@
+{
+  "version": 1,
+  "description": "Short-lived candidate queue for Woods Run X replies. Pending candidates expire after 72 hours.",
+  "updated_at": null,
+  "candidates": []
+}
