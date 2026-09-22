@@ -1,5 +1,5 @@
 {
-  "purpose": "Canonical account universe for the Woods Run daily X reply scan",
+  "purpose": "Canonical account universe and provenance for the Woods Run daily X reply scan",
   "source_list": {
     "name": "Forestry-Forest Products",
     "id": "2098910622419407353",
@@ -10,5 +10,22 @@
   "seed_count": 312,
   "unique_handles": 312,
   "created_from_list_builder_source": true,
-  "update_policy": "Merge additional relevant X lists here by handle, deduplicate case-insensitively, preserve provenance, and do not remove existing accounts unless explicitly requested."
+  "discovery_list_catalog": {
+    "path": "data/x_reply_source_lists.csv",
+    "research_date": "2026-09-22",
+    "worthwhile_lists": 15,
+    "use": "Discovery sources only until individual member accounts are verified and deduplicated into x_reply_watchlist.csv.",
+    "mining_order": [
+      "933088564329377793",
+      "1293568023299862528",
+      "994249395955732480",
+      "906970",
+      "31431440",
+      "118899368",
+      "1382398723259396096",
+      "53575674"
+    ],
+    "excluded_categories": "Wildlife-heavy, generic environment/climate, ecology-dominant, public-land-only, and ambiguous non-business lists unless later individually justified."
+  },
+  "update_policy": "Merge verified relevant accounts from additional public X lists into x_reply_watchlist.csv by handle, deduplicate case-insensitively, preserve source-list provenance, and do not remove existing accounts unless explicitly requested."
 }
