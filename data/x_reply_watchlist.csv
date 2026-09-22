@@ -1,0 +1,313 @@
+index,handle,display_name,priority_tier,verification_status
+0,@COFI_INFO,BC Council of Forest Industries,A,Research-verified 2026
+1,@BCForestSafety,BC Forest Safety Council,A,Candidate — verify before automation
+2,@CanforCorp,Canfor,A,Research-verified 2026
+3,@UBCForestry,UBC Faculty of Forestry,A,Research-verified via current network
+4,@CanadianForestInd,Canadian Forest Industries,A,Candidate — verify before automation
+5,@CIF_IFC,Canadian Institute of Forestry,A,Research-verified 2026
+6,@FPInnovations,FPInnovations,A,Research-verified 2026
+7,@FPAC_APFC,Forest Products Association of Canada,A,Research-verified 2026
+8,@Autolog,Autolog,A,Candidate — verify before automation
+9,@BIDGroup,BID Group,A,Candidate — verify before automation
+10,@LumberNews,Madison's Lumber Prices,A,Research-verified 2026
+11,@TreeFrogNews,Tree Frog Forestry News,A,Research-verified 2026
+12,@OntarioForestry,Ontario Forest Industries Association,A,Candidate — verify before automation
+13,@ONresources,Ontario Ministry of Natural Resources,A,Strong-confidence profile
+14,@LoggingSawmilling,Logging & Sawmilling Journal,A,Candidate — verify before automation
+15,@usfs_rmrs,Rocky Mountain Research Station,A,Research-verified 2026
+16,@LakeStatesLogging,Great Lakes Timber Professionals Association,A,Candidate — verify before automation
+17,@GLTPA,Great Lakes Timber Professionals Association,A,Candidate — verify before automation
+18,@mnforestry,Minnesota DNR Forestry,A,Strong-confidence profile
+19,@ForestandPaper,American Forest & Paper Association,A,Strong-confidence profile
+20,@AFMForestry,American Forest Management,A,Candidate — verify before automation
+21,@2x4seven,Ashley Boeckholt,A,Research-verified 2026
+22,@BTGTimberland,BTG Pactual Timberland Investment Group,A,Candidate — verify before automation
+23,@CampbellGlobal,Campbell Global,A,Candidate — verify before automation
+24,@fsWoodLab,Forest Products Laboratory,A,Research-verified 2026
+25,@ForestResources,Forest Resources Association,A,Research-verified 2026
+26,@Forisk,Forisk Consulting,A,Candidate — verify before automation
+27,@NAFO_Forests,National Alliance of Forest Owners,A,Strong-confidence profile
+28,@StateForesters,National Association of State Foresters,A,Research-verified 2026
+29,@NHLA_Official,National Hardwood Lumber Association,A,Research-verified 2026
+30,@PotlatchDeltic,PotlatchDeltic,A,Candidate — verify before automation
+31,@foresters,Society of American Foresters,A,Strong-confidence profile
+32,@timberharvmag,Timber Harvesting Magazine,A,Research-verified 2026
+33,@timberpromag,Timber Processing Magazine,A,Research-verified 2026
+34,@forestservice,USDA Forest Service,A,Research-verified 2026
+35,@Weyerhaeuser,Weyerhaeuser,A,Strong-confidence profile
+36,@wood_mizer,Wood-Mizer,A,Strong-confidence profile
+37,@APAwood,APA – The Engineered Wood Association,A,Strong-confidence profile
+38,@RandomLengths,Random Lengths / Fastmarkets,A,Candidate — verify before automation
+39,@Tigercat_Machines,Tigercat,A,Candidate — verify before automation
+40,@WoodBIOMASS,Woodfiber & Biomass,A,Research-verified 2026
+41,@globalaginvest,Global AgInvesting,A,Research-verified 2026
+42,@JoeScan_Inc,JoeScan,A,Research-verified 2026
+43,@MaineForest,Maine Forest Service,A,Candidate — verify before automation
+44,@northernlogger,Northern Logger & Timber Processor,A,Candidate — verify before automation
+45,@usfs_nrs,Northern Research Station,A,Research-verified 2026
+46,@wood2energy,Eric Kingsley / Innovative Natural Resource Solutions,A,Research-verified 2026
+47,@ORDeptForestry,Oregon Department of Forestry,A,Research-verified 2026
+48,@OSUForestry,Oregon State College of Forestry,A,Candidate — verify before automation
+49,@waDNR,Washington DNR,A,Strong-confidence profile
+50,@amforest_org,American Forest Resource Council,A,Strong-confidence profile
+51,@USNR,USNR,A,Candidate — verify before automation
+52,@VT_CNRE,Virginia Tech College of Natural Resources and Environment,A,Candidate — verify before automation
+53,@FLForestService,Florida Forest Service,A,Research-verified 2026
+54,@ForestLandowner,Forest Landowners Association,A,Research-verified 2026
+55,@GeorgiaForestry,Georgia Forestry Association,A,Research-verified 2026
+56,@GaTrees,Georgia Forestry Commission,A,Strong-confidence profile
+57,@NCForestryAssoc,NC Forestry Association,A,Research-verified 2026
+58,@NCStateCNR,NC State College of Natural Resources,A,Research-verified 2026
+59,@RoyOMartin,RoyOMartin,A,Research-verified 2026
+60,@ForestryCommish,South Carolina Forestry Commission,A,Research-verified 2026
+61,@SFPAinfo,Southern Forest Products Association,A,Candidate — verify before automation
+62,@southernloggin,Southern Loggin' Times,A,Research-verified 2026
+63,@SPIB_FL,Southern Pine Inspection Bureau,A,Candidate — verify before automation
+64,@usfs_srs,Southern Research Station,A,Research-verified 2026
+65,@TXForestService,Texas A&M Forest Service,A,Strong-confidence profile
+66,@TimberMartSouth,TimberMart-South,A,Candidate — verify before automation
+67,@UGAWarnell,UGA Warnell School of Forestry & Natural Resources,A,Research-verified via current mentions
+68,@ForestryVA,Virginia Department of Forestry,A,Strong-confidence profile
+69,@rayonier,Rayonier,A,Strong-confidence profile
+70,@RMSForestry,Resource Management Service,A,Candidate — verify before automation
+71,@TimberAutomation,Timber Automation,A,Candidate — verify before automation
+72,@Forest2Market,Forest2Market,A,Candidate — verify before automation
+73,@CAL_FIRE,CAL FIRE,A,Strong-confidence profile
+74,@FAL_GovNL,"Forestry, Agriculture and Lands NL",A,Strong-confidence profile
+75,@albertaforests,Alberta Forest Products Association,A,Research-verified 2026
+76,@MichiganDNR,Michigan DNR,A,Strong-confidence profile
+77,@UMontanaWAF,University of Montana W.A. Franke College of Forestry,A,Candidate — verify before automation
+78,@MaineDACF,"Maine Department of Agriculture, Conservation and Forestry",A,Strong-confidence profile
+79,@NYSDEC,New York State DEC,A,Strong-confidence profile
+80,@SUNYESF,SUNY College of Environmental Science and Forestry,A,Candidate — verify before automation
+81,@ms_forestry,Mississippi Forestry Association,A,Research-verified 2026
+82,@MSStateForestry,Mississippi State Forestry,A,Candidate — verify before automation
+83,@SE_RxFire,Southeast Rx Fire,A,Research-verified 2026
+84,@texasforestry,Texas Forestry Association,A,Research-verified 2026
+85,@ForestEconomic,Forest Economic Advisors,B,Candidate — verify before automation
+86,@AK_Forestry,Alaska Division of Forestry & Fire Protection,B,Strong-confidence profile
+87,@AHMI,Appalachian Hardwood Manufacturers,B,Candidate — verify before automation
+88,@WVForestry,West Virginia Division of Forestry,B,Candidate — verify before automation
+89,@WVFA,West Virginia Forestry Association,B,Candidate — verify before automation
+90,@NL_Forest_Ind,NL Forest Industry Association,B,Strong-confidence profile
+91,@ForestryNB,New Brunswick forestry network,B,Candidate — verify before automation
+92,@NovaScotiaForestry,Nova Scotia forestry network,B,Candidate — verify before automation
+93,@BC_CFA,BC Community Forest Association,B,Research-verified 2026
+94,@Jennifer_Grenz,Dr. Jennifer Grenz,B,Research-verified 2026
+95,@TolkoIndustries,Tolko Industries,B,Profile verified by company directory
+96,@WestFraser,West Fraser,B,Strong-confidence profile
+97,@WSCA,Western Silvicultural Contractors' Association,B,Candidate — verify before automation
+98,@resolutefp,Resolute Forest Products,B,Profile verified by company directory
+99,@canadawoodgroup,Canada Wood Group,B,Research-verified 2026
+100,@DerekNighbor,Derek Nighbor,B,Research-verified via FPAC mentions
+101,@paperexcelle_ca,Paper Excellence Canada,B,Profile verified by company source
+102,@PulpPaperCanada,Pulp & Paper Canada,B,Candidate — verify before automation
+103,@TFCJournal,The Forestry Chronicle,B,Strong-confidence profile
+104,@WoodBusinessCA,Wood Business,B,Candidate — verify before automation
+105,@MercerInt,Mercer International,B,Strong-confidence profile
+106,@AlbertaPacific,Alberta-Pacific Forest Industries,B,Strong-confidence profile
+107,@QuebecForest,Quebec forest industry network,B,Candidate — verify before automation
+108,@LoggingIdaho,Associated Logging Contractors - Idaho,B,Research-verified 2026
+109,@IDLandBoard,Idaho Department of Lands,B,Candidate — verify before automation
+110,@UIdahoCNR,University of Idaho College of Natural Resources,B,Candidate — verify before automation
+111,@TimberProInc,TimberPro,B,Candidate — verify before automation
+112,@MIForestAssoc,Michigan Forest Products Council,B,Candidate — verify before automation
+113,@MinnForestry,Minnesota Forest Industries,B,Candidate — verify before automation
+114,@WIDNR,Wisconsin DNR,B,Candidate — verify before automation
+115,@WiscPaper,Wisconsin Paper Council,B,Strong-confidence profile
+116,@WIpaper,Wisconsin Paper Council,B,Candidate — verify before automation
+117,@MOForestProducts,Missouri Forest Products Association,B,Candidate — verify before automation
+118,@IHLA,Indiana Hardwood Lumbermen's Association,B,Candidate — verify before automation
+119,@OHForestryAssoc,Ohio Forestry Association,B,Candidate — verify before automation
+120,@CSFS_Outreach,Colorado State Forest Service,B,Strong-confidence profile
+121,@CSUWarner,Colorado State Warner College of Natural Resources,B,Candidate — verify before automation
+122,@MontanaDNRC,Montana DNRC,B,Candidate — verify before automation
+123,@woodcouncil,American Wood Council,B,Strong-confidence profile
+124,@banditchippers,Bandit Industries,B,Strong-confidence profile
+125,@Boise_Cascade,Boise Cascade,B,Strong-confidence profile
+126,@FederalForest,Federal Forest Resource Coalition,B,Strong-confidence profile
+127,@forestprodjournal,Forest Products Journal,B,Strong-confidence profile
+128,@ForestrySup,Forestry Suppliers,B,Research-verified 2026
+129,@ForestrySysInc,Forestry Systems,B,Research-verified 2026
+130,@lumbertribe,Greg Branecky,B,Research-verified 2026
+131,@HancockNatural,Hancock Natural Resource Group,B,Candidate — verify before automation
+132,@TheHardwoodFed,Hardwood Federation,B,Strong-confidence profile
+133,@JoeMXLumber,Joe Campagna / MaterialsXchange,B,Research-verified 2026
+134,@MaterialsXchange,MaterialsXchange,B,Candidate — verify before automation
+135,@morbark,Morbark,B,Strong-confidence profile
+136,@NWH_Inc,NWH,B,Research-verified 2026
+137,@NWPCA,National Wooden Pallet & Container Association,B,Candidate — verify before automation
+138,@PalletEnterprise,Pallet Enterprise,B,Candidate — verify before automation
+139,@PelletFuels,Pellet Fuels Institute,B,Candidate — verify before automation
+140,@RailwayTieAssoc,Railway Tie Association,B,Candidate — verify before automation
+141,@Rotochopper,Rotochopper,B,Candidate — verify before automation
+142,@SoftwoodLumber,Softwood Lumber Board,B,Candidate — verify before automation
+143,@ForestrySource,The Forestry Source,B,Strong-confidence profile
+144,@woodbiomag,Wood Bioenergy Magazine,B,Research-verified 2026
+145,@WoodWorks,WoodWorks,B,Candidate — verify before automation
+146,@BiomassMagazine,Biomass Magazine,B,Candidate — verify before automation
+147,@CommodityLumber,Commodity Lumber Report,B,Research-verified 2026
+148,@DomtarEveryday,Domtar,B,Candidate — verify before automation
+149,@MassTimberConf,International Mass Timber Conference,B,Candidate — verify before automation
+150,@LogMaxHeads,Log Max,B,Candidate — verify before automation
+151,@ALumberCo,Michael Haas,B,Research-verified 2026
+152,@TAPPI,TAPPI,B,Candidate — verify before automation
+153,@teklstudio,CutLog,B,Research-verified 2026
+154,@RISIinfo,Fastmarkets Forest Products,B,Candidate — verify before automation
+155,@Finnovations,Finnovations / Finnos,B,Candidate — verify before automation
+156,@KomatsuForest,Komatsu Forest,B,Candidate — verify before automation
+157,@MiCROTEC,MiCROTEC,B,Candidate — verify before automation
+158,@NuveenNaturalCap,Nuveen Natural Capital,B,Candidate — verify before automation
+159,@Ponsse_Group,Ponsse,B,Candidate — verify before automation
+160,@WaratahForestry,Waratah Forestry,B,Candidate — verify before automation
+161,@NYLumbermen,Empire State Forest Products Association,B,Candidate — verify before automation
+162,@MaineWoodProducts,Maine Forest Products Council,B,Candidate — verify before automation
+163,@MaineForestProducts,Maine Forest Products Council,B,Candidate — verify before automation
+164,@NELAforestry,Northeastern Loggers Association,B,Candidate — verify before automation
+165,@PAHardwoods,Pennsylvania Hardwoods Development Council,B,Candidate — verify before automation
+166,@UMaineFES,UMaine Forest Ecosystem Science,B,Candidate — verify before automation
+167,@VTFPR,"Vermont Forests, Parks & Recreation",B,Candidate — verify before automation
+168,@PennStateFEC,Penn State Forest Resources,B,Candidate — verify before automation
+169,@PennsylvaniaDCNR,Pennsylvania DCNR,B,Candidate — verify before automation
+170,@PFPA,Pennsylvania Forest Products Association,B,Candidate — verify before automation
+171,@SappiNA,Sappi North America,B,Strong-confidence profile
+172,@SewallForestry,Sewall Forestry & Natural Resource Consulting,B,Candidate — verify before automation
+173,@UWashingtonSEFS,UW School of Environmental and Forest Sciences,B,Candidate — verify before automation
+174,@WAStateDNR,Washington State DNR,B,Candidate — verify before automation
+175,@talkingforests,Candra Burns,B,Research-verified 2026
+176,@LucidyneTech,Lucidyne Technologies,B,Candidate — verify before automation
+177,@MasonBruce,"Mason, Bruce & Girard",B,Candidate — verify before automation
+178,@PetersonCorp,Peterson Pacific,B,Candidate — verify before automation
+179,@GreenDiamondCo,Green Diamond Resource Company,B,Candidate — verify before automation
+180,@KAHC,Kentucky Association of Hardwood Industries,B,Candidate — verify before automation
+181,@KYForestry,Kentucky Division of Forestry,B,Candidate — verify before automation
+182,@TennesseeForestry,Tennessee Division of Forestry,B,Candidate — verify before automation
+183,@TennesseeForestryA,Tennessee Forestry Association,B,Candidate — verify before automation
+184,@UKForestry,University of Kentucky Forestry,B,Candidate — verify before automation
+185,@ALForestry,Alabama Forestry Association,B,Strong-confidence profile
+186,@AlabamaForestry,Alabama Forestry Commission,B,Candidate — verify before automation
+187,@ArkansasForestry,Arkansas Forestry Division,B,Candidate — verify before automation
+188,@AuburnSFWS,Auburn School of Forestry & Wildlife Sciences,B,Candidate — verify before automation
+189,@CarolinaLoggers,Carolina Loggers Association,B,Strong-confidence profile
+190,@TreeHealthDoc,Denita Hadziabdicz,B,Research-verified 2026
+191,@Enviva,Enviva,B,Strong-confidence profile
+192,@FLForestryAssoc,Florida Forestry Association,B,Strong-confidence profile
+193,@LDAF,Louisiana Department of Agriculture & Forestry,B,Candidate — verify before automation
+194,@LouisianaForestry,Louisiana Forestry Association,B,Candidate — verify before automation
+195,@MSForestryComm,Mississippi Forestry Commission,B,Candidate — verify before automation
+196,@SCForestryAssoc,South Carolina Forestry Association,B,Candidate — verify before automation
+197,@SLMAGovAffairs,Southeastern Lumber Manufacturers Association,B,Research-verified 2026
+198,@SouthernPine,Southern Pine lumber industry network,B,Candidate — verify before automation
+199,@SFASUForestry,Stephen F. Austin Forestry,B,Candidate — verify before automation
+200,@TexasAandMForest,Texas A&M Forest Service research/extension network,B,Candidate — verify before automation
+201,@VirginiaLoggers,Virginia Loggers Association,B,Research-verified 2026
+202,@CooperMachine,Cooper Machine,B,Candidate — verify before automation
+203,@FandWForestry,F&W Forestry Services,B,Candidate — verify before automation
+204,@HurdleMachine,Hurdle Machine Works,B,Candidate — verify before automation
+205,@RayonierAM,Rayonier Advanced Materials,B,Candidate — verify before automation
+206,@azstateforestry,Arizona Department of Forestry and Fire Management,B,Strong-confidence profile
+207,@NAUForestry,Northern Arizona University School of Forestry,B,Candidate — verify before automation
+208,@WWPI,Western Wood Products Association,B,Candidate — verify before automation
+209,@BCGovFireInfo,BC Wildfire Service,B,Strong-confidence profile
+210,@Kruger_Products,Kruger Products,B,Research-verified 2026
+211,@AlbertaWildfire,Alberta Wildfire,B,Strong-confidence profile
+212,@ohiodnr,Ohio DNR,B,Strong-confidence profile
+213,@BLM_CO,BLM Colorado,B,Strong-confidence profile
+214,@AmericanHardwds,American Hardwoods,B,Research-verified 2026
+215,@machinefinder,Deere MachineFinder,B,Research-verified 2026
+216,@IntlPaperCo,International Paper,B,Strong-confidence profile
+217,@RealAmericanHwd,Real American Hardwood,B,Research-verified 2026
+218,@forestproud,forestproud,B,Strong-confidence profile
+219,@CTDEEPNews,Connecticut DEEP,B,Strong-confidence profile
+220,@MassDCR,Massachusetts DCR,B,Strong-confidence profile
+221,@RhodeIslandDEM,Rhode Island DEM,B,Strong-confidence profile
+222,@UNHExtension,UNH Extension,B,Candidate — verify before automation
+223,@UVMExtension,UVM Extension,B,Candidate — verify before automation
+224,@UMaine,University of Maine,B,Research-verified 2026
+225,@PennStateExt,Penn State Extension,B,Candidate — verify before automation
+226,@GPNF,Gifford Pinchot National Forest,B,Strong-confidence profile
+227,@ClemsonCAFLS,"Clemson College of Agriculture, Forestry & Life Sciences",B,Candidate — verify before automation
+228,@LSUAgCenter,LSU AgCenter,B,Candidate — verify before automation
+229,@CalPolyNRES,Cal Poly Natural Resources,C,Candidate — verify before automation
+230,@forestnb,forestNB,C,Strong-confidence profile
+231,@catalystpaper,Catalyst Paper,C,Strong-confidence profile
+232,@DallanLP,Dallan LP,C,Strong-confidence profile
+233,@Kimmy_Haak,Kim Haakstad,C,Strong-confidence profile
+234,@CanadianWoodlands,Canadian woodland operations network,C,Candidate — verify before automation
+235,@ManitobaForestry,Manitoba forestry network,C,Candidate — verify before automation
+236,@SaskForestry,Saskatchewan forestry network,C,Candidate — verify before automation
+237,@Work_Wild,Work Wild / Alberta forestry careers,C,Strong-confidence profile
+238,@KansasForests,Kansas Forest Service,C,Candidate — verify before automation
+239,@NebraskaForest,Nebraska Forest Service,C,Candidate — verify before automation
+240,@idahologgerstr1,Idaho Logger Strong,C,Research-verified 2026
+241,@Cleereman,Cleereman Industries,C,Candidate — verify before automation
+242,@IndianaDNR,Indiana DNR,C,Candidate — verify before automation
+243,@MOForestry,Missouri Department of Conservation Forestry,C,Candidate — verify before automation
+244,@YoderLumber,Yoder Lumber,C,Strong-confidence profile
+245,@BakerProducts,Baker Products,C,Candidate — verify before automation
+246,@NevadaForestry,Nevada Division of Forestry,C,Candidate — verify before automation
+247,@NRfirescience,Northern Rockies Fire Science Network,C,Strong-confidence profile
+248,@UtahFFSL,"Utah Forestry, Fire & State Lands",C,Candidate — verify before automation
+249,@WyomingForestry,Wyoming State Forestry Division,C,Candidate — verify before automation
+250,@AWPAinfo,American Wood Protection Association,C,Candidate — verify before automation
+251,@DynaProducts,Dyna Products,C,Candidate — verify before automation
+252,@FSC_US,FSC US,C,Strong-confidence profile
+253,@TreeStrategist,Jim Searing,C,Research-verified 2026
+254,@Multitekinc,Multitek North America,C,Candidate — verify before automation
+255,@paperboardpkg,Paperboard Packaging Council,C,Candidate — verify before automation
+256,@BioPreferred,USDA BioPreferred Program,C,Strong-confidence profile
+257,@WoodProducts,Wood Products Manufacturers Association,C,Candidate — verify before automation
+258,@BillerudNA,Billerud North America,C,Candidate — verify before automation
+259,@ForestTechAssoc,Forest Technology Systems,C,Candidate — verify before automation
+260,@Hultdins,Hultdins,C,Candidate — verify before automation
+261,@ManulifeIM,Manulife Investment Management,C,Candidate — verify before automation
+262,@PIMA,PIMA / TAPPI,C,Candidate — verify before automation
+263,@ThinkWood,Think Wood,C,Candidate — verify before automation
+264,@VimekForest,Vimek,C,Candidate — verify before automation
+265,@MarkJMcLaughlin,"Mark McLaughlin, PhD",C,Research-verified 2026
+266,@NHForestRangers,New Hampshire Forest Rangers,C,Candidate — verify before automation
+267,@NHWoodProducts,New Hampshire forest-products network,C,Candidate — verify before automation
+268,@NYForestOwners,New York Forest Owners Association,C,Candidate — verify before automation
+269,@VermontWood,Vermont Wood Works Council / wood products network,C,Candidate — verify before automation
+270,@AlleghenyHardwood,Allegheny Hardwood Utilization Group,C,Candidate — verify before automation
+271,@NDForestService,North Dakota Forest Service,C,Candidate — verify before automation
+272,@TimberProducts,Timber Products Company,C,Candidate — verify before automation
+273,@ARForestResources,Arkansas Forest Resources Center,C,Candidate — verify before automation
+274,@MSLoggers,Mississippi Loggers Association,C,Strong-confidence profile
+275,@SoPineCouncil,Southern Pine Awareness Network,C,Candidate — verify before automation
+276,@SouthernWoodProducers,Southern wood products network,C,Candidate — verify before automation
+277,@NewmanMachine,Newman Machine Company,C,Candidate — verify before automation
+278,@OklahomaForestry,Oklahoma Forestry Services,C,Candidate — verify before automation
+279,@TreatedWood,Western Wood Preservers Institute,C,Candidate — verify before automation
+280,@UCBerkeleyRausser,UC Berkeley Rausser College,C,Candidate — verify before automation
+281,@GovNL,Government of Newfoundland and Labrador,C,Strong-confidence profile
+282,@MIF_UBC,Master of International Forestry - UBC,C,Strong-confidence profile
+283,@WorkSafeBC,WorkSafeBC,C,Candidate — verify before automation
+284,@FreeToGrow_,Free to Grow in Forestry,C,Strong-confidence profile
+285,@MetsäFibre,Metsä Fibre,C,Candidate — verify before automation
+286,@storaenso,Stora Enso,C,Candidate — verify before automation
+287,@IllinoisDNR,Illinois DNR,C,Strong-confidence profile
+288,@iowadnr,Iowa DNR,C,Strong-confidence profile
+289,@ColoradoDNR,Colorado Department of Natural Resources,C,Strong-confidence profile
+290,@HumboldtToiyabe,Humboldt-Toiyabe National Forest,C,Strong-confidence profile
+291,@BoisePapers,Boise Paper,C,Candidate — verify before automation
+292,@CaterpillarInc,Caterpillar,C,Candidate — verify before automation
+293,@GraphicPkgIntl,Graphic Packaging International,C,Candidate — verify before automation
+294,@JohnDeere,John Deere,C,Strong-confidence profile
+295,@NationalForests,National Forest Foundation,C,Strong-confidence profile
+296,@NeenahPaper,Neenah Paper,C,Candidate — verify before automation
+297,@TimberNewsUSA,TimberNewsUSA,C,Strong-confidence profile
+298,@USDAClimateHubs,USDA Climate Hubs,C,Strong-confidence profile
+299,@Vermeer,Vermeer,C,Candidate — verify before automation
+300,@WestRock,WestRock,C,Candidate — verify before automation
+301,@BillerudGlobal,Billerud,C,Candidate — verify before automation
+302,@SmurfitKappa,Smurfit Kappa,C,Candidate — verify before automation
+303,@CornellCALS,Cornell CALS,C,Candidate — verify before automation
+304,@mohawkpaper,Mohawk,C,Candidate — verify before automation
+305,@NJDEP,New Jersey DEP,C,Candidate — verify before automation
+306,@USDA_FS_DPG,Dakota Prairie Grasslands,C,Strong-confidence profile
+307,@SDWildlandFire,South Dakota Wildland Fire,C,Candidate — verify before automation
+308,@waDNR_fire,Washington DNR Fire,C,Candidate — verify before automation
+309,@UTIAg,University of Tennessee Institute of Agriculture,C,Candidate — verify before automation
+310,@UAEX_edu,University of Arkansas System Division of Agriculture,C,Candidate — verify before automation
+311,@virginia_tech,Virginia Tech,C,Research-verified 2026
