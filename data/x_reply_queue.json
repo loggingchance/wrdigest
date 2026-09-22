@@ -1,6 +1,58 @@
 {
   "version": 1,
   "description": "Short-lived candidate queue for Woods Run X replies. Pending candidates expire after 72 hours.",
-  "updated_at": null,
-  "candidates": []
+  "updated_at": "2026-09-23T00:00:00Z",
+  "candidates": [
+    {
+      "id": "2102065118540452040",
+      "discovered_at": "2026-09-23T00:00:00Z",
+      "expires_at": "2026-09-26T00:00:00Z",
+      "account": "@2x4seven",
+      "display_name": "Ashley Boeckholt",
+      "target_post_url": "https://x.com/2x4seven/status/2102065118540452040",
+      "target_status_id": "2102065118540452040",
+      "target_post_date": "2026-09-21",
+      "why_match": "A lumber-industry consultant shared a current macroeconomic piece with a forestry-products audience; Woods Run's same-week diesel/lumber divergence adds a concrete sector-specific operating read.",
+      "woods_run_issue_date": "2026-09-21",
+      "woods_run_item": "U.S. diesel reached $6.285/gal, up 31.8 cents in a week, while November lumber fell 7.2% to $537/MBF.",
+      "draft_reply": "One forestry-sector datapoint that makes the macro squeeze tangible: U.S. diesel hit $6.285/gal, up 31.8¢ in a week, while November lumber fell 7.2% to $537/MBF. Higher operating costs and a weaker product-price signal are arriving together.",
+      "review_intent_url": "https://twitter.com/intent/tweet?in_reply_to=2102065118540452040&text=One%20forestry-sector%20datapoint%20that%20makes%20the%20macro%20squeeze%20tangible%3A%20U.S.%20diesel%20hit%20%246.285%2Fgal%2C%20up%2031.8%C2%A2%20in%20a%20week%2C%20while%20November%20lumber%20fell%207.2%25%20to%20%24537%2FMBF.%20Higher%20operating%20costs%20and%20a%20weaker%20product-price%20signal%20are%20arriving%20together.",
+      "status": "pending",
+      "source_watchlist": "canonical x_reply_watchlist.csv (Tier A)"
+    },
+    {
+      "id": "2100719382213366229",
+      "discovered_at": "2026-09-23T00:00:00Z",
+      "expires_at": "2026-09-26T00:00:00Z",
+      "account": "@COFI_INFO",
+      "display_name": "BC Council of Forest Industries",
+      "target_post_url": "https://x.com/COFI_INFO/status/2100719382213366229",
+      "target_status_id": "2100719382213366229",
+      "target_post_date": "2026-09-17",
+      "why_match": "COFI's post argues for the community importance of a strong B.C. forest sector; Woods Run has a specific current stumpage/price contrast that adds operating economics rather than generic agreement.",
+      "woods_run_issue_date": "2026-09-18",
+      "woods_run_item": "B.C. forecast average Crown stumpage at C$13.55/m³, 11% below its February assumption, while raising its SPF 2x4 lumber-price assumption.",
+      "draft_reply": "B.C. cut its expected Crown stumpage to C$13.55/m³, 11% below its February assumption, even while lifting its SPF 2x4 price assumption. A good illustration of why headline lumber prices and forest economics can diverge.",
+      "review_intent_url": "https://twitter.com/intent/tweet?in_reply_to=2100719382213366229&text=B.C.%20cut%20its%20expected%20Crown%20stumpage%20to%20C%2413.55%2Fm%C2%B3%2C%2011%25%20below%20its%20February%20assumption%2C%20even%20while%20lifting%20its%20SPF%202x4%20price%20assumption.%20A%20good%20illustration%20of%20why%20headline%20lumber%20prices%20and%20forest%20economics%20can%20diverge.",
+      "status": "pending",
+      "source_watchlist": "canonical x_reply_watchlist.csv (Tier A)"
+    },
+    {
+      "id": "2099589048121938428",
+      "discovered_at": "2026-09-23T00:00:00Z",
+      "expires_at": "2026-09-26T00:00:00Z",
+      "account": "@azstateforestry",
+      "display_name": "Arizona Department of Forestry and Fire Management",
+      "target_post_url": "https://x.com/azstateforestry/status/2099589048121938428",
+      "target_status_id": "2099589048121938428",
+      "target_post_date": "2026-09-14",
+      "why_match": "The post is directly about the Sunflower restoration work; the newest Woods Run issue adds the unusually useful scale, financing and timber-volume details. The post is slightly older than the normal window but the development is newly relevant and still active.",
+      "woods_run_issue_date": "2026-09-22",
+      "woods_run_item": "Kaibab GNA work covers nearly 14,000 acres, is expected to produce about 36 MMBF, and combines $6.4M in federal funding with a dollar-for-dollar Salt River Project match and reinvested timber-sale revenue.",
+      "draft_reply": "The scale is notable: the first Kaibab GNA push covers nearly 14,000 acres and is expected to produce about 36 MMBF. With $6.4M in federal funding matched by SRP and sale revenue reinvested, commercial timber is helping finance the restoration loop.",
+      "review_intent_url": "https://twitter.com/intent/tweet?in_reply_to=2099589048121938428&text=The%20scale%20is%20notable%3A%20the%20first%20Kaibab%20GNA%20push%20covers%20nearly%2014%2C000%20acres%20and%20is%20expected%20to%20produce%20about%2036%20MMBF.%20With%20%246.4M%20in%20federal%20funding%20matched%20by%20SRP%20and%20sale%20revenue%20reinvested%2C%20commercial%20timber%20is%20helping%20finance%20the%20restoration%20loop.",
+      "status": "pending",
+      "source_watchlist": "canonical x_reply_watchlist.csv / standing priority handle"
+    }
+  ]
 }
