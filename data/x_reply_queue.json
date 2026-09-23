@@ -1,7 +1,7 @@
 {
   "version": 1,
   "description": "Short-lived candidate queue for Woods Run X replies. Pending candidates expire after 72 hours.",
-  "updated_at": "2026-09-23T00:00:00Z",
+  "updated_at": "2026-09-23T18:01:23Z",
   "candidates": [
     {
       "id": "2102065118540452040",
