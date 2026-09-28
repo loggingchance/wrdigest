@@ -12,9 +12,7 @@ from __future__ import annotations
 
 import json
 import os
-import re
 import sys
-import time
 import urllib.error
 import urllib.request
 from pathlib import Path
@@ -139,42 +137,6 @@ def fetch_public(url: str) -> tuple[int, bytes, str]:
         return exc.code, b"", exc.headers.get("Content-Type", "")
     except Exception:
         return 0, b"", ""
-
-
-def public_issue_status(page_url: str, card_url: str) -> tuple[bool, bool]:
-    """Perform one nonblocking diagnostic check of the public page and card.
-
-    Social publishing must never wait on GitHub Pages propagation. Repository
-    assets are authoritative for Buffer publishing; the public-site check is
-    informational only.
-    """
-    page_status, page_body, _ = fetch_public(page_url)
-    card_status, card_body, card_type = fetch_public(card_url)
-
-    page_text = page_body.decode("utf-8", errors="replace") if page_body else ""
-    has_card_meta = card_url in page_text
-    has_large_card = bool(
-        re.search(
-            r'<meta[^>]+name=["\\\']twitter:card["\\\'][^>]+content=["\\\']summary_large_image["\\\']',
-            page_text,
-            flags=re.IGNORECASE,
-        )
-        or re.search(
-            r'<meta[^>]+content=["\\\']summary_large_image["\\\'][^>]+name=["\\\']twitter:card["\\\']',
-            page_text,
-            flags=re.IGNORECASE,
-        )
-    )
-    page_live = page_status == 200
-    card_live = card_status == 200 and bool(card_body) and "image" in card_type.lower()
-
-    print(
-        "Public-site diagnostic: "
-        f"page={page_status}, card={card_status}, "
-        f"og-card={'yes' if has_card_meta else 'no'}, "
-        f"large-card={'yes' if has_large_card else 'no'}"
-    )
-    return page_live, card_live
 
 
 def recent_post_exists(
@@ -351,9 +313,9 @@ def main() -> None:
             all_channels, service, target["name"], target["label"]
         )
 
-    # Publishing is driven by the repository assets generated in the upstream
-    # workflow, not by GitHub Pages propagation. This prevents a slow/404 Pages
-    # deployment from delaying X, Instagram, or YouTube.
+    # Publishing is driven exclusively by repository assets generated in the
+    # upstream workflow. GitHub Pages availability is deliberately not checked
+    # here, so a slow/404 Pages deployment cannot delay X, Instagram, or YouTube.
     local_card = Path("assets/cards") / f"{issue['date']}.png"
     local_reel = Path("assets/videos") / f"{issue['date']}.mp4"
     if not local_card.exists() or local_card.stat().st_size == 0:
@@ -362,8 +324,6 @@ def main() -> None:
         not local_reel.exists() or local_reel.stat().st_size == 0
     ):
         fail(f"Repository social reel is missing: {local_reel}")
-
-    public_issue_status(page_url, card_url)
 
     raw_root = "https://raw.githubusercontent.com/loggingchance/wrdigest/main"
     publish_card_url = f"{raw_root}/assets/cards/{issue['date']}.png"
