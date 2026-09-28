@@ -2,8 +2,10 @@
 """Publish the newest Woods Run issue to X, Instagram, and YouTube through Buffer.
 
 X receives the dated social card. Instagram and YouTube receive the same vertical
-Woods Run reel. YouTube is optional: if no YouTube channel is connected in Buffer,
-the daily publishing run continues normally for X and Instagram.
+Woods Run reel. Repository-generated assets are authoritative for publishing, so
+GitHub Pages propagation can never block or delay social delivery. YouTube is
+optional: if no YouTube channel is connected in Buffer, the daily publishing run
+continues normally for X and Instagram.
 """
 
 from __future__ import annotations
@@ -20,8 +22,6 @@ from pathlib import Path
 BUFFER_API = "https://api.buffer.com"
 SITE_ROOT = "https://woodsrun.forestenterprise.org"
 MAX_X_TEXT = 280
-WAIT_ATTEMPTS = 18
-WAIT_SECONDS = 10
 
 TARGETS = (
     {"service": "twitter", "name": "ForestBizSchool", "label": "X", "required": True},
@@ -141,42 +141,40 @@ def fetch_public(url: str) -> tuple[int, bytes, str]:
         return 0, b"", ""
 
 
-def wait_until_live(page_url: str, card_url: str) -> bool:
-    print(f"Waiting for public issue: {page_url}")
-    for attempt in range(1, WAIT_ATTEMPTS + 1):
-        page_status, page_body, _ = fetch_public(page_url)
-        card_status, card_body, card_type = fetch_public(card_url)
+def public_issue_status(page_url: str, card_url: str) -> tuple[bool, bool]:
+    """Perform one nonblocking diagnostic check of the public page and card.
 
-        page_text = page_body.decode("utf-8", errors="replace") if page_body else ""
-        has_card_meta = card_url in page_text
-        has_large_card = bool(
-            re.search(
-                r'<meta[^>]+name=["\']twitter:card["\'][^>]+content=["\']summary_large_image["\']',
-                page_text,
-                flags=re.IGNORECASE,
-            )
-            or re.search(
-                r'<meta[^>]+content=["\']summary_large_image["\'][^>]+name=["\']twitter:card["\']',
-                page_text,
-                flags=re.IGNORECASE,
-            )
+    Social publishing must never wait on GitHub Pages propagation. Repository
+    assets are authoritative for Buffer publishing; the public-site check is
+    informational only.
+    """
+    page_status, page_body, _ = fetch_public(page_url)
+    card_status, card_body, card_type = fetch_public(card_url)
+
+    page_text = page_body.decode("utf-8", errors="replace") if page_body else ""
+    has_card_meta = card_url in page_text
+    has_large_card = bool(
+        re.search(
+            r'<meta[^>]+name=["\\\']twitter:card["\\\'][^>]+content=["\\\']summary_large_image["\\\']',
+            page_text,
+            flags=re.IGNORECASE,
         )
-        card_is_image = card_status == 200 and bool(card_body) and "image" in card_type.lower()
-
-        if page_status == 200 and has_card_meta and has_large_card and card_is_image:
-            print("Dated page and social card are live with the expected metadata.")
-            return True
-
-        print(
-            f"Attempt {attempt}/{WAIT_ATTEMPTS}: page={page_status}, "
-            f"card={card_status}, og-card={'yes' if has_card_meta else 'no'}, "
-            f"large-card={'yes' if has_large_card else 'no'}"
+        or re.search(
+            r'<meta[^>]+content=["\\\']summary_large_image["\\\'][^>]+name=["\\\']twitter:card["\\\']',
+            page_text,
+            flags=re.IGNORECASE,
         )
-        if attempt < WAIT_ATTEMPTS:
-            time.sleep(WAIT_SECONDS)
+    )
+    page_live = page_status == 200
+    card_live = card_status == 200 and bool(card_body) and "image" in card_type.lower()
 
-    print("Public page is live but the card has not reached Pages yet; using the GitHub-hosted card for Buffer.")
-    return False
+    print(
+        "Public-site diagnostic: "
+        f"page={page_status}, card={card_status}, "
+        f"og-card={'yes' if has_card_meta else 'no'}, "
+        f"large-card={'yes' if has_large_card else 'no'}"
+    )
+    return page_live, card_live
 
 
 def recent_post_exists(
@@ -353,11 +351,23 @@ def main() -> None:
             all_channels, service, target["name"], target["label"]
         )
 
-    card_live = wait_until_live(page_url, card_url)
-    publish_card_url = card_url if card_live else "https://raw.githubusercontent.com/loggingchance/wrdigest/main/assets/cards/" + issue["date"] + ".png"
-    reel_status, reel_body, reel_type = fetch_public(reel_url)
-    reel_live = reel_status == 200 and bool(reel_body) and ("video" in reel_type.lower() or "octet-stream" in reel_type.lower())
-    publish_reel_url = reel_url if reel_live else "https://raw.githubusercontent.com/loggingchance/wrdigest/main/assets/videos/" + issue["date"] + ".mp4"
+    # Publishing is driven by the repository assets generated in the upstream
+    # workflow, not by GitHub Pages propagation. This prevents a slow/404 Pages
+    # deployment from delaying X, Instagram, or YouTube.
+    local_card = Path("assets/cards") / f"{issue['date']}.png"
+    local_reel = Path("assets/videos") / f"{issue['date']}.mp4"
+    if not local_card.exists() or local_card.stat().st_size == 0:
+        fail(f"Repository social card is missing: {local_card}")
+    if ("instagram" in selected or "youtube" in selected) and (
+        not local_reel.exists() or local_reel.stat().st_size == 0
+    ):
+        fail(f"Repository social reel is missing: {local_reel}")
+
+    public_issue_status(page_url, card_url)
+
+    raw_root = "https://raw.githubusercontent.com/loggingchance/wrdigest/main"
+    publish_card_url = f"{raw_root}/assets/cards/{issue['date']}.png"
+    publish_reel_url = f"{raw_root}/assets/videos/{issue['date']}.mp4"
 
     texts = {
         "twitter": compose_x_post(issue, page_url),
