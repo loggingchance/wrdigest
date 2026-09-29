@@ -95,9 +95,6 @@ h2 { margin-bottom: 0; font-family: Georgia, 'Times New Roman', serif; font-size
 .archive-item h2 a:hover { color: var(--forest); }
 .archive-item p { grid-column: 2 / 4; margin: -8px 0 0; color: var(--muted); font-size: 14px; }
 .archive-link { font-size: 13px; white-space: nowrap; }
-.edition-follow { margin: 17px 0 0; }
-.x-follow-button { display: inline-block; padding: 8px 13px; border: 1px solid var(--forest); border-radius: 4px; color: var(--paper); background: var(--forest); font-size: 13px; font-weight: 700; line-height: 1.2; text-decoration: none; }
-.x-follow-button:hover { background: #193524; text-decoration: none; }
 .special-opportunity { padding-top: 30px; }
 .special-opportunity .story { padding-bottom: 18px; }
 .wet-woods-box { margin: 32px 0 12px; padding: 24px 24px 20px; background: #edf1e9; border-left: 4px solid var(--forest); border-top: 1px solid #c8d4cb; border-right: 1px solid #c8d4cb; border-bottom: 1px solid #c8d4cb; }
@@ -134,8 +131,6 @@ h2 { margin-bottom: 0; font-family: Georgia, 'Times New Roman', serif; font-size
   .archive-link { margin-top: 4px; }
   .edition-nav { display: block; }
   .edition-nav a { display: block; margin-bottom: 8px; }
-  .edition-follow { margin-top: 14px; }
-  .x-follow-button { padding: 8px 12px; font-size: 12.5px; }
   .wet-woods-box { padding: 20px 18px 16px; }
   .wet-woods-box h2 { font-size: 24px; }
   .book-button { margin-bottom: 10px; }
