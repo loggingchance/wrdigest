@@ -1,0 +1,63 @@
+#!/usr/bin/env python3
+import json, os, urllib.request, urllib.error
+from pathlib import Path
+
+api_key = os.environ.get("RESEND_API_KEY", "").strip()
+if not api_key:
+    raise SystemExit("RESEND_API_KEY is not configured")
+
+trigger = json.loads(Path("data/email_test_trigger.json").read_text(encoding="utf-8"))
+test_id = trigger["test_id"]
+subject = f"TEST ONLY — Woods Run Digest delivery test — {test_id}"
+
+text = """WOODS RUN DIGEST — TEST ONLY
+
+This is a fake Woods Run Digest generated solely to test the new GitHub Actions → Resend delivery path.
+
+Lead story
+A fictional sawmill reports that its coffee machine increased throughput by 18% after preventive maintenance.
+
+By the numbers
+• Logs processed: 12,345 imaginary tons
+• Diesel: $0.00 in this fictional test
+• Delivery objective: one verified email
+
+If you received this message, GitHub Actions successfully called Resend using the repository secret.
+
+TEST ONLY — NOT A REAL WOODS RUN EDITION.
+"""
+
+html = """<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta http-equiv="X-UA-Compatible" content="IE=edge"></head><body style="margin:0;background-color:#f2eee5;"><table width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#f2eee5"><tr><td align="center" style="padding-top:24px;padding-right:12px;padding-bottom:24px;padding-left:12px;"><table width="600" cellpadding="0" cellspacing="0" border="0" bgcolor="#fffdf8" style="width:100%;max-width:600px;background-color:#fffdf8;border-top-width:5px;border-top-style:solid;border-top-color:#244a34;"><tr><td style="padding-top:28px;padding-right:30px;padding-bottom:28px;padding-left:30px;"><p style="margin-top:0;margin-right:0;margin-bottom:4px;margin-left:0;font-family:Georgia,'Times New Roman',serif;font-size:28px;line-height:34px;color:#1f3b2b;font-weight:bold;">WOODS RUN DIGEST</p><p style="margin-top:0;margin-right:0;margin-bottom:18px;margin-left:0;font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:21px;color:#8a2e2e;font-weight:bold;">TEST ONLY — NOT A REAL EDITION</p><p style="margin-top:0;margin-right:0;margin-bottom:18px;margin-left:0;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:23px;color:#333333;">This fake edition is testing the new GitHub Actions → Resend delivery path.</p><p style="margin-top:0;margin-right:0;margin-bottom:8px;margin-left:0;font-family:Georgia,'Times New Roman',serif;font-size:21px;line-height:27px;color:#222222;font-weight:bold;">Fictional sawmill finds an 18% coffee-machine throughput gain</p><p style="margin-top:0;margin-right:0;margin-bottom:18px;margin-left:0;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:23px;color:#333333;">A completely fictional mill reports that preventive maintenance on the break-room coffee machine increased imaginary throughput by 18%. No forestry conclusions should be drawn from this test.</p><table width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#f4f0e5"><tr><td style="padding-top:14px;padding-right:16px;padding-bottom:14px;padding-left:16px;"><p style="margin-top:0;margin-right:0;margin-bottom:8px;margin-left:0;font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:21px;color:#333333;"><strong>By the numbers</strong></p><p style="margin-top:0;margin-right:0;margin-bottom:4px;margin-left:0;font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:21px;color:#333333;">Imaginary logs processed: 12,345 tons</p><p style="margin-top:0;margin-right:0;margin-bottom:4px;margin-left:0;font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:21px;color:#333333;">Fictional diesel: $0.00/gal</p><p style="margin-top:0;margin-right:0;margin-bottom:0;margin-left:0;font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:21px;color:#333333;">Delivery objective: one verified email</p></td></tr></table><p style="margin-top:18px;margin-right:0;margin-bottom:0;margin-left:0;font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:19px;color:#555555;">If you received this, GitHub Actions successfully called Resend using the repository secret.</p></td></tr></table></td></tr></table></body></html>"""
+
+payload = json.dumps({
+    "from": "Steve Bick | Woods Run Digest <no_reply@forestenterprise.org>",
+    "to": ["steve@northeastforests.com"],
+    "reply_to": ["steve@northeastforests.com"],
+    "subject": subject,
+    "text": text,
+    "html": html,
+    "headers": {"X-Entity-Ref-ID": f"woods-run-github-test-{test_id}"}
+}).encode("utf-8")
+
+req = urllib.request.Request(
+    "https://api.resend.com/emails",
+    data=payload,
+    method="POST",
+    headers={
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json",
+        "Idempotency-Key": f"woods-run-github-test-{test_id}",
+        "User-Agent": "WoodsRunDigest-GitHub-Test/1.0"
+    },
+)
+try:
+    with urllib.request.urlopen(req, timeout=30) as response:
+        result = json.loads(response.read().decode("utf-8"))
+except urllib.error.HTTPError as exc:
+    raise SystemExit(f"Resend HTTP {exc.code}: {exc.read().decode(errors='replace')}")
+
+email_id = result.get("id")
+if not email_id:
+    raise SystemExit(f"Resend returned no email id: {result}")
+print(f"RESEND_EMAIL_ID={email_id}")
+print(f"TEST_SUBJECT={subject}")
