@@ -32,19 +32,19 @@ jobs:
           echo "Mountain time: $HOUR:$MINUTE"
 
       - name: Check out credential runner
-        if: github.event_name == 'workflow_dispatch' || steps.localtime.outputs.run == 'true'
+        if: github.event_name == 'workflow_dispatch' || github.event_name == 'push' || steps.localtime.outputs.run == 'true'
         uses: actions/checkout@v4
         with:
           ref: main
 
       - name: Set up Python
-        if: github.event_name == 'workflow_dispatch' || steps.localtime.outputs.run == 'true'
+        if: github.event_name == 'workflow_dispatch' || github.event_name == 'push' || steps.localtime.outputs.run == 'true'
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
 
       - name: Pull canonical issue from new Woods Run repository
-        if: github.event_name == 'workflow_dispatch' || steps.localtime.outputs.run == 'true'
+        if: github.event_name == 'workflow_dispatch' || github.event_name == 'push' || steps.localtime.outputs.run == 'true'
         shell: bash
         run: |
           set -euo pipefail
@@ -77,14 +77,14 @@ jobs:
           PY
 
       - name: Send same-date Woods Run email
-        if: github.event_name == 'workflow_dispatch' || steps.localtime.outputs.run == 'true'
+        if: github.event_name == 'workflow_dispatch' || github.event_name == 'push' || steps.localtime.outputs.run == 'true'
         env:
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
           WOODS_RUN_SEGMENT_ID: ec27b7e4-84e2-47af-83ce-7d77732ed557
         run: python scripts/publish_digest_email.py
 
       - name: Publish same-date social outputs
-        if: github.event_name == 'workflow_dispatch' || steps.localtime.outputs.run == 'true'
+        if: github.event_name == 'workflow_dispatch' || github.event_name == 'push' || steps.localtime.outputs.run == 'true'
         env:
           BUFFER_API_KEY: ${{ secrets.BUFFER_API_KEY }}
         run: python scripts/post_to_buffer.py
