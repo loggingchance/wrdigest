@@ -2,6 +2,10 @@ name: Woods Run delivery bridge
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/woods-run-delivery-bridge.yml'
   schedule:
     # 4:00 / 4:15 Mountain across DST; local-time guard allows the valid pair.
     - cron: '0,15 10 * * *'
