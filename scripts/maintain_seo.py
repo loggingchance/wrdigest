@@ -95,7 +95,7 @@ latest_block = (
 )
 home_path = ROOT / "index.html"
 home = home_path.read_text(encoding="utf-8")
-new_home, n = re.subn(r'<section class="latest-section"\b.*?</section>', latest_block, home, count=1, flags=re.S)
+new_home, n = re.subn(r'<section class="latest-section"[^>]*>.*?</section>', latest_block, home, count=1, flags=re.S)
 if n != 1:
     raise SystemExit("Could not locate homepage latest-section")
 write_if_changed(home_path, new_home, changed)
@@ -114,7 +114,7 @@ for issue in issues:
 archive_section = '<section class="archive-list" data-archive-list aria-live="polite">' + "".join(archive_items) + "</section>"
 archive_path = ROOT / "archive/index.html"
 archive_html = archive_path.read_text(encoding="utf-8")
-new_archive, n = re.subn(r'<section class="archive-list"\b.*?</section>', archive_section, archive_html, count=1, flags=re.S)
+new_archive, n = re.subn(r'<section class="archive-list"[^>]*>.*?</section>', archive_section, archive_html, count=1, flags=re.S)
 if n != 1:
     raise SystemExit("Could not locate archive-list section")
 write_if_changed(archive_path, new_archive, changed)
