@@ -18,6 +18,7 @@ concurrency:
 
 jobs:
   send:
+    if: ${{ github.event_name == 'workflow_dispatch' || !contains(github.event.head_commit.message, '[skip-email]') }}
     runs-on: ubuntu-latest
     steps:
       - name: Check out latest site state
