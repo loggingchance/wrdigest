@@ -16,39 +16,15 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
+      - name: Install GitHub Models CLI
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh extension install https://github.com/github/gh-models --force
+
       - name: Test GitHub Models inference
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          python - <<'PY'
-          import json, os, urllib.request, urllib.error
-          payload = {
-            "model":"openai/gpt-4.1-mini",
-            "messages":[{"role":"user","content":"Reply with exactly: MODELS_OK"}],
-            "temperature":0
-          }
-          req=urllib.request.Request(
-            "https://models.github.ai/inference/chat/completions",
-            data=json.dumps(payload).encode(),
-            method="POST",
-            headers={
-              "Authorization":"Bearer "+os.environ["GH_TOKEN"],
-              "Content-Type":"application/json",
-              "Accept":"application/json",
-              "X-GitHub-Api-Version":"2026-03-10",
-              "User-Agent":"WoodsRunDigest/1.0"
-            }
-          )
-          try:
-            with urllib.request.urlopen(req,timeout=60) as r:
-              raw=r.read().decode("utf-8","replace")
-              print("STATUS",r.status)
-              print("CONTENT_TYPE",r.headers.get("content-type"))
-              print("RAW",raw[:500])
-              if raw.strip():
-                data=json.loads(raw)
-                print(data["choices"][0]["message"]["content"])
-          except urllib.error.HTTPError as e:
-            print("HTTP",e.code,e.read().decode("utf-8","replace")[:1000])
-            raise
-          PY
+          out="$(gh models run openai/gpt-4.1-mini 'Reply with exactly: MODELS_OK')"
+          echo "$out"
+          test "$out" = "MODELS_OK"
