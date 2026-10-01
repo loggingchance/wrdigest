@@ -1,0 +1,27 @@
+name: Test Copilot CLI access
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/test-copilot.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  copilot-requests: write
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Copilot CLI
+        run: npm install -g @github/copilot
+      - name: Test Copilot inference
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          out="$(copilot -p 'Reply with exactly: COPILOT_OK' -s)"
+          echo "$out"
+          echo "$out" | grep -q 'COPILOT_OK'
