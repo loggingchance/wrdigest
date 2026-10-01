@@ -1,0 +1,33 @@
+name: Email Woods Run striking pick
+
+on:
+  schedule:
+    # Covers 10:00 AM Mountain in MDT/MST; script date/idempotency guards duplicates.
+    - cron: '0 16,17 * * *'
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'data/striking_email_trigger.json'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: woods-run-striking-email
+  cancel-in-progress: false
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Email today's Woods Run striking pick
+        env:
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+        run: python scripts/email_striking_pick.py
